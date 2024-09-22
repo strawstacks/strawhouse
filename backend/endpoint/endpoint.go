@@ -12,5 +12,5 @@ func Bind(app *fiber.App, systemHandler *system.Handler, getHandler *get.Handler
 	systemRoute.Get("upload", systemHandler.Upload)
 
 	// * Get route
-	systemRoute.Get("/", getHandler.Get)
+	app.Get("/*", getHandler.Get)
 }

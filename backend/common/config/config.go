@@ -5,6 +5,7 @@ import (
 	"github.com/bsthun/goutils"
 	"gopkg.in/yaml.v3"
 	"os"
+	"path/filepath"
 )
 
 type Client struct {
@@ -43,6 +44,10 @@ func Init() *Config {
 	if err := uu.Validate(config); err != nil {
 		uu.Fatal("Invalid configuration", err)
 	}
+
+	// * Normalize config
+	*config.DataRoot, _ = filepath.Abs(*config.DataRoot)
+	*config.ObserveRoot, _ = filepath.Abs(*config.ObserveRoot)
 
 	return config
 }

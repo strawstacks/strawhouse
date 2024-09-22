@@ -12,10 +12,10 @@ func init() {
 func extractPathSlice(path string, depth uint32) []byte {
 	count := int(depth)
 
-	for index := 1; index < len(path); index++ {
+	for index := 0; index < len(path); index++ {
 		if path[index] == '/' {
 			count--
-			if count == 0 {
+			if count <= 0 {
 				return []byte(path[:index])
 			}
 		}
