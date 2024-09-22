@@ -5,11 +5,13 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
 )
 
 func Verify(path string, token, key string) error {
 	// * Reconstruct data
+	token = strings.ReplaceAll(token, "*", "+")
 	data, err := base64.StdEncoding.DecodeString(token)
 	if err != nil || len(data) != 18 {
 		return fmt.Errorf("invalid token")

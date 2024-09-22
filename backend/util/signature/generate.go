@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"strings"
 	"time"
 )
 
@@ -55,6 +56,7 @@ func Generate(version uint8, mode uint8, depth uint32, expired time.Time, path s
 
 	// * Convert data to base64
 	encodedData := base64.StdEncoding.EncodeToString(data[:])
+	encodedData = strings.ReplaceAll(encodedData, "+", "*")
 
 	return encodedData
 }
