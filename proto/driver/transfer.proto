@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pb";
+
+import "google/protobuf/empty.proto";
+
+service DriverTransfer {
+  rpc FileUpload (UploadRequest) returns (google.protobuf.Empty);
+  rpc FileDownloadHash (DownloadHashRequest) returns (DownloadHashResponse);
+}
+
+message UploadRequest {
+  string directory = 1;
+  string name = 2;
+  string hash = 3;
+  bytes content = 4;
+}
+
+message DownloadHashRequest {
+  string hash = 3;
+}
+
+message DownloadHashResponse {
+  string directory = 1;
+  string name = 2;
+  bytes content = 3;
+}
