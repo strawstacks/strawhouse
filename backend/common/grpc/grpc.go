@@ -22,7 +22,7 @@ func Init(lc fx.Lifecycle, config *config.Config) *grpc.Server {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go func() {
-				lis, err := net.Listen(*config.Listen[0], *config.Listen[1])
+				lis, err := net.Listen(*config.ProtoListen[0], *config.ProtoListen[1])
 				if err != nil {
 					uu.Fatal("Unable to listen", err)
 				}

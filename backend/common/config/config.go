@@ -13,7 +13,8 @@ type Client struct {
 }
 
 type Config struct {
-	Listen      [2]*string `yaml:"listen" validate:"required"`
+	WebListen   [2]*string `yaml:"webListen" validate:"required"`
+	ProtoListen [2]*string `yaml:"protoListen" validate:"required"`
 	DataRoot    *string    `yaml:"dataRoot" validate:"dirpath"`
 	ObserveRoot *string    `yaml:"observeRoot" validate:"dirpath"`
 	Clients     []*Client  `yaml:"clients"`
