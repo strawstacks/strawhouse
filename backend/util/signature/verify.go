@@ -4,17 +4,17 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
+	uu "github.com/bsthun/goutils"
 	"strings"
 	"time"
 )
 
-func Verify(path string, token, key string) error {
+func Verify(path string, token, key string) *uu.ErrorInstance {
 	// * Reconstruct data
 	token = strings.ReplaceAll(token, "*", "+")
 	data, err := base64.StdEncoding.DecodeString(token)
 	if err != nil || len(data) != 18 {
-		return fmt.Errorf("invalid token")
+		return uu.Err(false, "Malformed token")
 	}
 
 	// Extract data
@@ -26,12 +26,12 @@ func Verify(path string, token, key string) error {
 
 	// * Check version
 	if version != 1 {
-		return fmt.Errorf("invalid version")
+		return uu.Err(false, "Token version not supported")
 	}
 
 	// * Check expired
 	if time.Now().After(expired) {
-		return fmt.Errorf("token expired")
+		return uu.Err(false, "Token expired")
 	}
 
 	// * Reconstruct path
@@ -54,7 +54,7 @@ func Verify(path string, token, key string) error {
 
 	// * Compare token
 	if token != encodedData {
-		return fmt.Errorf("invalid token")
+		return uu.Err(false, "Invalid token")
 	}
 
 	return nil
