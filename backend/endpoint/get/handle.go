@@ -1,13 +1,18 @@
 package get
 
-import "backend/common/config"
+import (
+	"backend/common/config"
+	"backend/util/signature"
+)
 
 type Handler struct {
-	Config *config.Config
+	Config    *config.Config
+	Signature *signature.Signature
 }
 
-func NewHandler(config *config.Config) *Handler {
+func NewHandler(config *config.Config, signature *signature.Signature) *Handler {
 	return &Handler{
-		Config: config,
+		Config:    config,
+		Signature: signature,
 	}
 }

@@ -1,7 +1,6 @@
 package get
 
 import (
-	"backend/util/signature"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"mime"
@@ -17,7 +16,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	token := c.Query("t")
 
 	// * Verify the file
-	if err := signature.Verify(path, token, *r.Config.Clients[0].Key); err != nil {
+	if err := r.Signature.Verify(path, token); err != nil {
 		return err
 	}
 

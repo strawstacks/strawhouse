@@ -2,7 +2,6 @@ package signature
 
 import (
 	"encoding/base64"
-	"github.com/davecgh/go-spew/spew"
 	"reflect"
 	"time"
 	"unsafe"
@@ -56,10 +55,7 @@ func (r *Signature) Generate(version uint8, mode uint8, depth uint32, expired ti
 	// * Convert data to base64
 	base64buffer := make([]byte, 24)
 	base64.StdEncoding.Encode(base64buffer, data)
-	sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&base64buffer))
-	stringHeader := reflect.StringHeader{Data: sliceHeader.Data, Len: sliceHeader.Len}
-	encoded := *(*string)(unsafe.Pointer(&stringHeader))
+	encoded := string(base64buffer[:])
 	ReplaceChar(&encoded, '+', '*')
-	spew.Dump(encoded)
 	return encoded
 }

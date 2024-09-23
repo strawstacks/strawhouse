@@ -3,15 +3,17 @@ package signature
 import (
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
-	"strings"
+	"reflect"
 	"time"
+	"unsafe"
 )
 
 func (r *Signature) Verify(path string, token string) *uu.ErrorInstance {
 	// * Reconstruct data
-	token = strings.ReplaceAll(token, "*", "+")
-	data, err := base64.StdEncoding.DecodeString(token)
-	if err != nil || len(data) != 18 {
+	ReplaceChar(&token, '*', '+')
+	data := make([]byte, 18)
+	ln, err := base64.StdEncoding.Decode(data, []byte(token))
+	if err != nil || ln != 18 {
 		return uu.Err(false, "Malformed token")
 	}
 
@@ -41,17 +43,21 @@ func (r *Signature) Verify(path string, token string) *uu.ErrorInstance {
 	}
 
 	// * Sign data
+	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
+	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 18}
 	r.Hash.Reset()
-	r.Hash.Write(data[:7])
+	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	r.Hash.Write(pathValue)
 	signature := r.Hash.Sum(nil)
 	copy(data[7:], signature[:11])
 
 	// * Convert data to base64
-	encodedData := base64.StdEncoding.EncodeToString(data[:])
+	base64buffer := make([]byte, 24)
+	base64.StdEncoding.Encode(base64buffer, data)
+	encoded := string(base64buffer[:])
 
 	// * Compare token
-	if token != encodedData {
+	if token != encoded {
 		return uu.Err(false, "Invalid token")
 	}
 

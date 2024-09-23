@@ -24,9 +24,8 @@ func extractPathSlice(path string, depth uint32) []byte {
 }
 
 func ReplaceChar(str *string, oldChar, newChar rune) {
-	// Convert the string to a slice of bytes
 	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
-		Data: uintptr((*reflect.StringHeader)(unsafe.Pointer(str)).Data),
+		Data: (*reflect.StringHeader)(unsafe.Pointer(str)).Data,
 		Len:  len(*str),
 	}))
 

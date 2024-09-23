@@ -8,6 +8,7 @@ import (
 	"backend/endpoint/get"
 	"backend/endpoint/system"
 	"backend/procedure/driver/metadata"
+	"backend/util/signature"
 	"go.uber.org/fx"
 )
 
@@ -17,6 +18,7 @@ func main() {
 			config.Init,
 			fiber.Init,
 			grpc.Init,
+			signature.Init,
 			system.NewHandler,
 			get.NewHandler,
 		),
