@@ -1,15 +1,13 @@
 package signature
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"strings"
 	"time"
 )
 
-func Verify(path string, token, key string) *uu.ErrorInstance {
+func (r *Signature) Verify(path string, token string) *uu.ErrorInstance {
 	// * Reconstruct data
 	token = strings.ReplaceAll(token, "*", "+")
 	data, err := base64.StdEncoding.DecodeString(token)
@@ -22,7 +20,7 @@ func Verify(path string, token, key string) *uu.ErrorInstance {
 	mode := (data[1] & 0b10000000) >> 7
 	depth := uint32(data[1] & 0b00111111)
 	offset := (uint64(data[2]) << 32) | (uint64(data[3]) << 24) | (uint64(data[4]) << 16) | (uint64(data[5]) << 8) | uint64(data[6])
-	expired := startTime.Add(time.Duration(offset) * time.Second)
+	expired := time.Unix(int64(offset), 0)
 
 	// * Check version
 	if version != 1 {
@@ -43,10 +41,10 @@ func Verify(path string, token, key string) *uu.ErrorInstance {
 	}
 
 	// * Sign data
-	hmacHash := hmac.New(sha256.New, []byte(key))
-	hmacHash.Write(data[:7])
-	hmacHash.Write(pathValue)
-	signature := hmacHash.Sum(nil)
+	r.Hash.Reset()
+	r.Hash.Write(data[:7])
+	r.Hash.Write(pathValue)
+	signature := r.Hash.Sum(nil)
 	copy(data[7:], signature[:11])
 
 	// * Convert data to base64

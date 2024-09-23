@@ -1,17 +1,13 @@
 package signature
 
-import "time"
-
-var startTime time.Time
-
-func init() {
-	bangkokTime, _ := time.LoadLocation("Asia/Bangkok")
-	startTime = time.Date(2001, 9, 07, 17, 00, 00, 00, bangkokTime)
-}
+import (
+	"reflect"
+	"unsafe"
+)
 
 func extractPathSlice(path string, depth uint32) []byte {
 	if depth == 0 {
-		return []byte(path[:1])
+		return unsafe.Slice(unsafe.StringData(path), 1)
 	}
 
 	count := int(depth)
@@ -19,10 +15,25 @@ func extractPathSlice(path string, depth uint32) []byte {
 		if path[index] == '/' {
 			count--
 			if count <= 0 {
-				return []byte(path[:index])
+				return unsafe.Slice(unsafe.StringData(path), index)
 			}
 		}
 	}
 
-	return []byte(path[:1])
+	return unsafe.Slice(unsafe.StringData(path), 1)
+}
+
+func ReplaceChar(str *string, oldChar, newChar rune) {
+	// Convert the string to a slice of bytes
+	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
+		Data: uintptr((*reflect.StringHeader)(unsafe.Pointer(str)).Data),
+		Len:  len(*str),
+	}))
+
+	// Iterate through the byte slice and replace the old character with the new one
+	for i := 0; i < len(*byteSlice); i++ {
+		if (*byteSlice)[i] == byte(oldChar) {
+			(*byteSlice)[i] = byte(newChar)
+		}
+	}
 }
