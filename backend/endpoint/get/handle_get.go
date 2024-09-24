@@ -7,6 +7,7 @@ import (
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"mime"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -29,29 +30,27 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	}
 
 	// * Concatenate path
-	fpath := filepath.Join(root, path)
+	decodedPath, err := url.QueryUnescape(path)
+	if err != nil {
+		return uu.Err(false, "Unable to decode path", err)
+	}
+	decodedPath = filepath.Join(root, decodedPath)
 
 	// * Check if path is a directory
-	fileInfo, err := os.Stat(fpath)
+	fileInfo, err := os.Stat(decodedPath)
 	if err != nil || fileInfo.IsDir() {
 		return uu.Err(false, "File not found")
 	}
 
 	// * Open the file
-	file, err := os.Open(fpath)
+	file, err := os.Open(decodedPath)
 	if err != nil {
 		return uu.Err(false, "Unable to open file", err)
 	}
 	defer file.Close()
 
-	// * Skip first 64 bytes of the file
-	_, err = file.Seek(64, 0) // Skip first 64 bytes
-	if err != nil {
-		return uu.Err(false, "Unable to seek file", err)
-	}
-
 	// * Detect content type from file extension
-	contentType := mime.TypeByExtension(filepath.Ext(fpath))
+	contentType := mime.TypeByExtension(filepath.Ext(decodedPath))
 	if contentType == "" {
 		contentType = "text/plain"
 	}

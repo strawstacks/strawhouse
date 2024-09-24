@@ -58,7 +58,9 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	r.Hash.Reset()
 	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	r.Hash.Write(pathValue)
-	r.Hash.Write(attribute)
+	if action == enum.SignatureActionUpload {
+		r.Hash.Write(attribute)
+	}
 	signature := r.Hash.Sum(nil)
 
 	// * Compare token

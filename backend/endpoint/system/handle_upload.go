@@ -2,11 +2,15 @@ package system
 
 import (
 	"backend/type/enum"
+	"backend/type/payload"
+	"backend/type/response"
 	"backend/util/signature"
 	"crypto/sha256"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
+	"net/url"
+	"os"
 	"path/filepath"
 )
 
@@ -28,8 +32,18 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return uu.Err(false, "unable to decode attribute", err)
 	}
 
+	// * Construct path
+	directory := filepath.Join(*r.Config.DataRoot, destination)
+	relativePath := filepath.Join(destination, fileHeader.Filename)
+	absolutePath := filepath.Join(*r.Config.DataRoot, relativePath)
+
+	// * Ensure directory
+	if err := os.MkdirAll(directory, 0600); err != nil {
+		return uu.Err(false, "unable to create directory", err)
+	}
+
 	// * Check token
-	if err := r.Signature.Verify(enum.SignatureActionUpload, filepath.Join(destination, fileHeader.Filename), attrib, token); err != nil {
+	if err := r.Signature.Verify(enum.SignatureActionUpload, relativePath, attrib, token); err != nil {
 		return err
 	}
 
@@ -39,7 +53,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return uu.Err(false, "unable to open file", err)
 	}
 
-	// * Check sha256 hash
+	// * Calculate sha256 hash
 	hash := sha256.New()
 	fileBuffer := make([]byte, 1024)
 	for {
@@ -50,6 +64,8 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		hash.Write(fileBuffer[:n])
 	}
 	sum := hash.Sum(nil)
+
+	// * Check hash
 	if result, err := r.Pogreb.Get(sum); err != nil {
 		return uu.Err(false, "unable to check hash", err)
 	} else {
@@ -59,9 +75,16 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	}
 
 	// * Save file
-	if err := c.SaveFile(fileHeader, filepath.Join(*r.Config.DataRoot, destination, fileHeader.Filename)); err != nil {
+	if err := c.SaveFile(fileHeader, absolutePath); err != nil {
 		return uu.Err(false, "unable to save file", err)
 	}
 
-	return c.JSON("")
+	// * Encode base64 hash
+	encodedSum := base64.StdEncoding.EncodeToString(sum)
+
+	return c.JSON(response.Success(&payload.UploadResponse{
+		Path: uu.Ptr(url.QueryEscape(relativePath)),
+		Hash: &encodedSum,
+		Size: uu.Ptr(fileHeader.Size),
+	}))
 }

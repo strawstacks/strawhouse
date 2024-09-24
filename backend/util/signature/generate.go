@@ -61,7 +61,9 @@ func (r *Signature) Generate(version uint8, mode enum.SignatureMode, action enum
 	r.Hash.Reset()
 	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	r.Hash.Write(pathSlice)
-	r.Hash.Write(attribute)
+	if action == enum.SignatureActionUpload {
+		r.Hash.Write(attribute)
+	}
 	signature := r.Hash.Sum(nil)
 	copy(data[7:], signature[:20])
 
