@@ -5,6 +5,11 @@ import (
 	"unsafe"
 )
 
+type ExampleAttribute struct {
+	UploaderId  *uint64
+	SessionName *string
+}
+
 func extractPathSlice(path string, depth uint32) []byte {
 	if depth == 0 {
 		return unsafe.Slice(unsafe.StringData(path), 1)

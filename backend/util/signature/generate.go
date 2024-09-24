@@ -1,25 +1,28 @@
 package signature
 
 import (
+	"backend/type/enum"
 	"encoding/base64"
+	uu "github.com/bsthun/goutils"
 	"reflect"
+	"strconv"
 	"time"
 	"unsafe"
 )
 
-func (r *Signature) Generate(version uint8, mode uint8, depth uint32, expired time.Time, path string) string {
+func (r *Signature) Generate(version uint8, mode enum.SignatureMode, action enum.SignatureAction, depth uint32, expired time.Time, path string, attribute []byte) string {
 	// * Construct data
-	data := make([]byte, 18)
+	data := make([]byte, 27)
 
 	// * Add version 1 byte
 	data[0] = version
 
-	// * Add mode 1 byte
+	// * Add metadata 1 byte
 	var pathSlice []byte
-	if mode == 0 {
+	if mode == enum.SignatureModeFile {
 		data[1] &= 0b01111111
 		pathSlice = []byte(path)
-	} else {
+	} else if mode == enum.SignatureModeDirectory {
 		data[1] |= 0b10000000
 		pathSlice = extractPathSlice(path, depth)
 
@@ -28,6 +31,15 @@ func (r *Signature) Generate(version uint8, mode uint8, depth uint32, expired ti
 			depth = 63
 		}
 		data[1] |= byte(depth)
+	} else {
+		uu.Fatal("Invalid mode: "+strconv.Itoa(int(mode)), nil)
+	}
+	if action == enum.SignatureActionGet {
+		data[1] &= 0b10111111
+	} else if action == enum.SignatureActionUpload {
+		data[1] |= 0b01000000
+	} else {
+		uu.Fatal("Invalid action: "+strconv.Itoa(int(action)), nil)
 	}
 
 	// * Add expired time 5 bytes
@@ -49,11 +61,12 @@ func (r *Signature) Generate(version uint8, mode uint8, depth uint32, expired ti
 	r.Hash.Reset()
 	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	r.Hash.Write(pathSlice)
+	r.Hash.Write(attribute)
 	signature := r.Hash.Sum(nil)
-	copy(data[7:], signature[:11])
+	copy(data[7:], signature[:20])
 
 	// * Convert data to base64
-	base64buffer := make([]byte, 24)
+	base64buffer := make([]byte, 36)
 	base64.StdEncoding.Encode(base64buffer, data)
 	encoded := string(base64buffer[:])
 	ReplaceChar(&encoded, '+', '*')

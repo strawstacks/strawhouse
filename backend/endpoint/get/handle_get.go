@@ -1,6 +1,9 @@
 package get
 
 import (
+	"backend/type/enum"
+	"backend/util/signature"
+	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"mime"
@@ -14,9 +17,14 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	root := *r.Config.DataRoot
 	path := c.Path()
 	token := c.Query("t")
+	attr := c.Query("a")
+
+	// * Decode attributes
+	signature.ReplaceChar(&attr, '*', '+')
+	attrBytes, err := base64.StdEncoding.DecodeString(attr)
 
 	// * Verify the file
-	if err := r.Signature.Verify(path, token); err != nil {
+	if err := r.Signature.Verify(enum.SignatureActionGet, path, attrBytes, token); err != nil {
 		return err
 	}
 
