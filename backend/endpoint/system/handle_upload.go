@@ -9,7 +9,6 @@ import (
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
-	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -32,13 +31,19 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return uu.Err(false, "unable to decode attribute", err)
 	}
 
+	// * Check file name
+	fileHeader.Filename = r.Name.BaseName(fileHeader.Filename)
+	if len(fileHeader.Filename) == 0 {
+		return uu.Err(false, "invalid filename", nil)
+	}
+
 	// * Construct path
-	directory := filepath.Join(*r.Config.DataRoot, destination)
-	relativePath := filepath.Join(destination, fileHeader.Filename)
-	absolutePath := filepath.Join(*r.Config.DataRoot, relativePath)
+	directory := filepath.Clean(filepath.Join(*r.Config.DataRoot, destination))
+	relativePath := filepath.Clean(filepath.Join(destination, fileHeader.Filename))
+	absolutePath := filepath.Clean(filepath.Join(*r.Config.DataRoot, relativePath))
 
 	// * Ensure directory
-	if err := os.MkdirAll(directory, 0600); err != nil {
+	if err := os.MkdirAll(directory, 0700); err != nil {
 		return uu.Err(false, "unable to create directory", err)
 	}
 
@@ -83,7 +88,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	encodedSum := base64.StdEncoding.EncodeToString(sum)
 
 	return c.JSON(response.Success(&payload.UploadResponse{
-		Path: uu.Ptr(url.QueryEscape(relativePath)),
+		Path: uu.Ptr(relativePath),
 		Hash: &encodedSum,
 		Size: uu.Ptr(fileHeader.Size),
 	}))

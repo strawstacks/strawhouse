@@ -9,6 +9,7 @@ import (
 	"backend/endpoint/get"
 	"backend/endpoint/system"
 	"backend/procedure/driver/metadata"
+	"backend/util/name"
 	"backend/util/signature"
 	"go.uber.org/fx"
 )
@@ -20,6 +21,7 @@ func main() {
 			pogreb.Init,
 			fiber.Init,
 			grpc.Init,
+			name.Init,
 			signature.Init,
 			system.NewHandler,
 			get.NewHandler,

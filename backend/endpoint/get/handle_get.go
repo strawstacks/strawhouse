@@ -15,8 +15,13 @@ import (
 
 func (r *Handler) Get(c *fiber.Ctx) error {
 	// * Construct variables
-	root := *r.Config.DataRoot
 	path := c.Path()
+	path = filepath.Clean(path)
+	path, err := url.PathUnescape(path)
+	if err != nil {
+		return uu.Err(false, "Unable to decode path", err)
+	}
+	fpath := filepath.Join(*r.Config.DataRoot, path)
 	token := c.Query("t")
 	attr := c.Query("a")
 
@@ -29,28 +34,21 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 		return err
 	}
 
-	// * Concatenate path
-	decodedPath, err := url.QueryUnescape(path)
-	if err != nil {
-		return uu.Err(false, "Unable to decode path", err)
-	}
-	decodedPath = filepath.Join(root, decodedPath)
-
 	// * Check if path is a directory
-	fileInfo, err := os.Stat(decodedPath)
+	fileInfo, err := os.Stat(fpath)
 	if err != nil || fileInfo.IsDir() {
 		return uu.Err(false, "File not found")
 	}
 
 	// * Open the file
-	file, err := os.Open(decodedPath)
+	file, err := os.Open(fpath)
 	if err != nil {
 		return uu.Err(false, "Unable to open file", err)
 	}
 	defer file.Close()
 
 	// * Detect content type from file extension
-	contentType := mime.TypeByExtension(filepath.Ext(decodedPath))
+	contentType := mime.TypeByExtension(filepath.Ext(fpath))
 	if contentType == "" {
 		contentType = "text/plain"
 	}
