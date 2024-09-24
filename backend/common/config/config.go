@@ -18,6 +18,7 @@ type Config struct {
 	ProtoListen [2]*string `yaml:"protoListen" validate:"required"`
 	DataRoot    *string    `yaml:"dataRoot" validate:"dirpath"`
 	ObserveRoot *string    `yaml:"observeRoot" validate:"dirpath"`
+	PogrebPath  *string    `yaml:"pogrebPath" validate:"dirpath"`
 	Clients     []*Client  `yaml:"clients"`
 }
 
