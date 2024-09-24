@@ -3,8 +3,10 @@ module backend
 go 1.23.1
 
 require (
+	github.com/akrylysov/pogreb v0.10.2
 	github.com/bsthun/goutils v1.0.2
 	github.com/davecgh/go-spew v1.1.1
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	go.uber.org/fx v1.22.2
@@ -13,7 +15,6 @@ require (
 )
 
 require (
-	github.com/akrylysov/pogreb v0.10.2 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

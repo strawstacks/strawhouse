@@ -1,9 +1,10 @@
 package system
 
 import (
-	"backend/type/common"
 	"backend/type/enum"
+	"backend/util/signature"
 	"crypto/sha256"
+	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"path/filepath"
@@ -13,13 +14,22 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	// * Parse body
 	token := c.FormValue("token")
 	destination := c.FormValue("destination")
+	attribute := c.FormValue("attribute")
 	fileHeader, err := c.FormFile("file")
+	if token == "" || destination == "" || attribute == "" {
+		return uu.Err(false, "missing token, destination or attribute", nil)
+	}
 	if err != nil {
 		return uu.Err(false, "unable to parse file", err)
 	}
+	signature.ReplaceChar(&attribute, '+', '*')
+	attrib, err := base64.StdEncoding.DecodeString(attribute)
+	if err != nil {
+		return uu.Err(false, "unable to decode attribute", err)
+	}
 
 	// * Check token
-	if err := r.Signature.Verify(enum.SignatureActionUpload, filepath.Join(destination, fileHeader.Filename), []byte{}, token); err != nil {
+	if err := r.Signature.Verify(enum.SignatureActionUpload, filepath.Join(destination, fileHeader.Filename), attrib, token); err != nil {
 		return err
 	}
 
@@ -39,7 +49,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		}
 		hash.Write(fileBuffer[:n])
 	}
-	sum := hash.Sum([]byte{common.ProgrebFileHashPrefix})
+	sum := hash.Sum(nil)
 	if result, err := r.Pogreb.Get(sum); err != nil {
 		return uu.Err(false, "unable to check hash", err)
 	} else {

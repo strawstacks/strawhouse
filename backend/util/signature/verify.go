@@ -21,8 +21,8 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 
 	// Extract data
 	version := data[0]
-	mode := (data[1] & 0b10000000) >> 7
-	action := (data[1] & 0b01000000) >> 6
+	mode := enum.SignatureMode((data[1] & 0b10000000) >> 7)
+	action := enum.SignatureAction((data[1] & 0b01000000) >> 6)
 	depth := uint32(data[1] & 0b00111111)
 	offset := (uint64(data[2]) << 32) | (uint64(data[3]) << 24) | (uint64(data[4]) << 16) | (uint64(data[5]) << 8) | uint64(data[6])
 	expired := time.Unix(int64(offset), 0)
@@ -33,7 +33,7 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	}
 
 	// * Check action
-	if act != enum.SignatureAction(action) {
+	if act != action {
 		return uu.Err(false, "Invalid action")
 	}
 
@@ -44,10 +44,12 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 
 	// * Reconstruct path
 	var pathValue []byte
-	if mode == 0 {
+	if mode == enum.SignatureModeFile {
 		pathValue = []byte(path)
-	} else {
+	} else if mode == enum.SignatureModeDirectory {
 		pathValue = extractPathSlice(path, depth)
+	} else {
+		uu.Fatal("Invalid mode", nil)
 	}
 
 	// * Sign data
@@ -60,7 +62,7 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	signature := r.Hash.Sum(nil)
 
 	// * Compare token
-	if bytes.Equal(data[7:], signature) {
+	if !bytes.Equal(data[7:], signature[:20]) {
 		return uu.Err(false, "Invalid token")
 	}
 

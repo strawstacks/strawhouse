@@ -11,21 +11,17 @@ type ExampleAttribute struct {
 }
 
 func extractPathSlice(path string, depth uint32) []byte {
-	if depth == 0 {
-		return unsafe.Slice(unsafe.StringData(path), 1)
-	}
-
 	count := int(depth)
-	for index := 1; index < len(path); index++ {
+	for index := 0; index < len(path); index++ {
 		if path[index] == '/' {
 			count--
-			if count <= 0 {
-				return unsafe.Slice(unsafe.StringData(path), index)
+			if count < 0 {
+				return unsafe.Slice(unsafe.StringData(path), index+1)
 			}
 		}
 	}
 
-	return unsafe.Slice(unsafe.StringData(path), 1)
+	return unsafe.Slice(unsafe.StringData(path), len(path))
 }
 
 func ReplaceChar(str *string, oldChar, newChar rune) {

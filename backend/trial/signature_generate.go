@@ -4,6 +4,7 @@ import (
 	"backend/type/enum"
 	"backend/util/signature"
 	"bytes"
+	"encoding/base64"
 	"encoding/gob"
 	uu "github.com/bsthun/goutils"
 	"github.com/davecgh/go-spew/spew"
@@ -18,10 +19,13 @@ func main() {
 	}
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
-	gob.Register(signature.ExampleAttribute{})
+	gob.Register(new(signature.ExampleAttribute))
 	_ = enc.Encode(attribute)
 
-	token := sign.Generate(1, enum.SignatureModeDirectory, enum.SignatureActionGet, 2, time.Now().Add(20*time.Minute), "/photo/2024", buffer.Bytes())
+	token := sign.Generate(1, enum.SignatureModeDirectory, enum.SignatureActionUpload, 1, time.Now().Add(20*time.Minute), "/photo/2024", buffer.Bytes())
 
-	spew.Dump(token)
+	// Encode attribute to base64
+	base64Attr := base64.StdEncoding.EncodeToString(buffer.Bytes())
+	signature.ReplaceChar(&base64Attr, '+', '*')
+	spew.Dump(token, base64Attr)
 }

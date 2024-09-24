@@ -17,7 +17,7 @@ func Prepare() (*Signature, []byte) {
 	}
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
-	gob.Register(ExampleAttribute{})
+	gob.Register(new(ExampleAttribute))
 	_ = enc.Encode(attribute)
 	return signature, buffer.Bytes()
 }
