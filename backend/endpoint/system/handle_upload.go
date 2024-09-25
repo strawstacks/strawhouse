@@ -21,16 +21,19 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	destination := c.FormValue("destination")
 	attribute := c.FormValue("attribute")
 	fileHeader, err := c.FormFile("file")
-	if token == "" || destination == "" || attribute == "" {
+	if token == "" || destination == "" {
 		return uu.Err(false, "missing token, destination or attribute", nil)
 	}
 	if err != nil {
 		return uu.Err(false, "unable to parse file", err)
 	}
-	signature.ReplaceChar(&attribute, '+', '*')
-	attrib, err := base64.StdEncoding.DecodeString(attribute)
-	if err != nil {
-		return uu.Err(false, "unable to decode attribute", err)
+	var attrib []byte
+	if attribute != "" {
+		signature.ReplaceChar(&attribute, '+', '*')
+		attrib, err = base64.StdEncoding.DecodeString(attribute)
+		if err != nil {
+			return uu.Err(false, "unable to decode attribute", err)
+		}
 	}
 
 	// * Check file name
