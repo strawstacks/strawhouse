@@ -1,10 +1,10 @@
 package sign
 
 import (
-	"backend/type/enum"
-	"command/common"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
+	"github.com/strawstacks/strawhouse/command/common"
 	"log"
 	"strings"
 	"time"

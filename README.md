@@ -39,22 +39,25 @@ File server with HTTP and gRPC interface.
    - `dataRoot` is the root directory of static files.
    - `pogrebPath` is the directory for metadata database.
 
-2. **Running backend server**
+2. Choice 1: **Try with `go run`**
    ```bash
    git clone https://github.com/strawstacks/strawhouse.git
    cd strawhouse/
-   go run backend --config ./local/config.yaml
+   go run ./backend --config ./local/config.yaml
    ```
 
-3. **Building binary**
+3. Choice 2: **Compile binary from source**
    ```bash
-   go build -o ./local/backend backend
+   go build -o ./local/backend ./backend
+   mv ./local/backend /usr/local/bin/strawhousebackd
+   strawhousebackd --config /etc/strawhouse/backend/config.yaml
    ```
    
-4. **Running binary**
+4. Choice 3: **Download pre-built binary**
    ```bash
-   mv ./local/backend /usr/local/bin/strawhousebackd
-   strawhousebackd --config ./local/config.yaml
+   sudo wget -O /usr/local/bin/strawhousebackd https://github.com/strawstacks/strawhouse/releases/download/v0.1.0/strawhousebackd_linux_arm64
+   sudo chmod +x /usr/local/bin/strawhousebackd
+   strawhousebackd --config /etc/strawhouse/backend/config.yaml
    ```
    
 5. **Using service manager**
@@ -67,7 +70,7 @@ File server with HTTP and gRPC interface.
 
    [Service]
    Type=simple
-   ExecStart=/usr/local/bin/strawhousebackd --config /etc/strawhouse/config.yaml
+   ExecStart=/usr/local/bin/strawhousebackd --config /etc/strawhouse/backend/config.yaml
    Restart=on-failure
 
    [Install]
@@ -87,7 +90,7 @@ Why not Docker?
 Go library for interacting with backend.
 
 ```bash
-go get github.com/strawstacks/strawhouse/driver
+go get -u github.com/strawstacks/strawhouse/driver
 ```
 
 ```go
@@ -122,7 +125,6 @@ Sign token:
 ```bash
 strawc --action upload --depth 1 --expired 60 --mode dir --path photos/
 ```
-
 
 ## Credits
 

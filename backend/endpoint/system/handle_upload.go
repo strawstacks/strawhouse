@@ -1,16 +1,16 @@
 package system
 
 import (
-	"backend/type/enum"
-	"backend/type/payload"
-	"backend/type/response"
-	"backend/util/signature"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/xattr"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
+	"github.com/strawstacks/strawhouse/backend/type/payload"
+	"github.com/strawstacks/strawhouse/backend/type/response"
+	"github.com/strawstacks/strawhouse/backend/util/signature"
 	"os"
 	"path/filepath"
 )

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"command/cmd/config"
-	"command/cmd/sign"
-	"command/common"
 	"github.com/spf13/cobra"
+	"github.com/strawstacks/strawhouse/command/cmd/config"
+	"github.com/strawstacks/strawhouse/command/cmd/sign"
+	"github.com/strawstacks/strawhouse/command/common"
 	"os"
 )
 

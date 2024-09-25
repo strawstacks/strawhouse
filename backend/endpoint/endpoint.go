@@ -1,10 +1,10 @@
 package endpoint
 
 import (
-	"backend/endpoint/get"
-	"backend/endpoint/system"
-	"backend/type/response"
 	"github.com/gofiber/fiber/v2"
+	"github.com/strawstacks/strawhouse/backend/endpoint/get"
+	"github.com/strawstacks/strawhouse/backend/endpoint/system"
+	"github.com/strawstacks/strawhouse/backend/type/response"
 )
 
 func HandleRoot(c *fiber.Ctx) error {

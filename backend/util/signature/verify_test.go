@@ -1,9 +1,9 @@
 package signature
 
 import (
-	"backend/type/enum"
 	uu "github.com/bsthun/goutils"
 	"github.com/go-playground/assert/v2"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
 	"testing"
 	"time"
 )

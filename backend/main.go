@@ -1,16 +1,16 @@
 package main
 
 import (
-	"backend/common/config"
-	"backend/common/fiber"
-	"backend/common/grpc"
-	"backend/common/pogreb"
-	"backend/endpoint"
-	"backend/endpoint/get"
-	"backend/endpoint/system"
-	"backend/procedure/driver/metadata"
-	"backend/util/name"
-	"backend/util/signature"
+	"github.com/strawstacks/strawhouse/backend/common/config"
+	"github.com/strawstacks/strawhouse/backend/common/fiber"
+	"github.com/strawstacks/strawhouse/backend/common/grpc"
+	"github.com/strawstacks/strawhouse/backend/common/pogreb"
+	"github.com/strawstacks/strawhouse/backend/endpoint"
+	"github.com/strawstacks/strawhouse/backend/endpoint/get"
+	"github.com/strawstacks/strawhouse/backend/endpoint/system"
+	"github.com/strawstacks/strawhouse/backend/procedure/driver/metadata"
+	"github.com/strawstacks/strawhouse/backend/util/name"
+	"github.com/strawstacks/strawhouse/backend/util/signature"
 	"go.uber.org/fx"
 )
 

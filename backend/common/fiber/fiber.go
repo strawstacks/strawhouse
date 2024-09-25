@@ -1,10 +1,10 @@
 package fiber
 
 import (
-	"backend/common/config"
 	"context"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/strawstacks/strawhouse/backend/common/config"
 	"go.uber.org/fx"
 )
 

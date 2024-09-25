@@ -1,6 +1,8 @@
 package strawhouse
 
-import "backend/util/signature"
+import (
+	"github.com/strawstacks/strawhouse/backend/util/signature"
+)
 
 type Driver struct {
 	Server    string

@@ -1,7 +1,7 @@
 package metadata
 
 import (
-	"backend/common/pogreb"
+	"github.com/strawstacks/strawhouse/backend/common/pogreb"
 	"google.golang.org/grpc"
 	"proto/pb"
 )

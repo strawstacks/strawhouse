@@ -1,8 +1,8 @@
 package fiber
 
 import (
-	"backend/type/response"
 	"errors"
+	"github.com/strawstacks/strawhouse/backend/type/response"
 	"strings"
 
 	uu "github.com/bsthun/goutils"

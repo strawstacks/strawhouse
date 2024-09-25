@@ -2,11 +2,11 @@ package config
 
 import (
 	"bufio"
-	"command/common"
 	"fmt"
 	uu "github.com/bsthun/goutils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/strawstacks/strawhouse/command/common"
 	"log"
 	"os"
 	"strings"

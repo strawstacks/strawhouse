@@ -1,9 +1,9 @@
 package signature
 
 import (
-	"backend/type/enum"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
 	"reflect"
 	"strconv"
 	"time"

@@ -1,10 +1,10 @@
 package pogreb
 
 import (
-	"backend/common/config"
 	"context"
 	"github.com/akrylysov/pogreb"
 	uu "github.com/bsthun/goutils"
+	"github.com/strawstacks/strawhouse/backend/common/config"
 	"go.uber.org/fx"
 	"path/filepath"
 	"time"

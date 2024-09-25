@@ -1,9 +1,9 @@
 package grpc
 
 import (
-	"backend/common/config"
 	"context"
 	uu "github.com/bsthun/goutils"
+	"github.com/strawstacks/strawhouse/backend/common/config"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"net"

@@ -1,4 +1,4 @@
-module backend
+module github.com/strawstacks/strawhouse/backend
 
 go 1.23.1
 

@@ -1,10 +1,10 @@
 package signature
 
 import (
-	"backend/type/enum"
 	"bytes"
 	"encoding/gob"
 	uu "github.com/bsthun/goutils"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
 	"testing"
 	"time"
 )

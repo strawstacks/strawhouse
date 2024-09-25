@@ -1,9 +1,9 @@
 package signature
 
 import (
-	"backend/common/config"
 	"crypto/hmac"
 	"crypto/sha256"
+	"github.com/strawstacks/strawhouse/backend/common/config"
 	"hash"
 	"sync"
 )

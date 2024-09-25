@@ -1,8 +1,8 @@
 package common
 
 import (
-	strawhouse "driver"
 	"github.com/spf13/viper"
+	strawhouse "github.com/strawstacks/strawhouse/driver"
 	"log"
 )
 

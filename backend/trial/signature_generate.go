@@ -1,13 +1,13 @@
 package main
 
 import (
-	"backend/type/enum"
-	"backend/util/signature"
 	"bytes"
 	"encoding/base64"
 	"encoding/gob"
 	uu "github.com/bsthun/goutils"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
+	"github.com/strawstacks/strawhouse/backend/util/signature"
 	"time"
 )
 

@@ -1,10 +1,10 @@
 package signature
 
 import (
-	"backend/type/enum"
 	"bytes"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
 	"reflect"
 	"time"
 	"unsafe"
@@ -54,7 +54,7 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 			pathValue = extractPathSlice(path, depth)
 		}
 	} else {
-		uu.Fatal("Invalid mode", nil)
+		uu.Fatal("invalid mode", nil)
 	}
 
 	// * Sign data
@@ -69,7 +69,7 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 
 	// * Compare token
 	if !bytes.Equal(data[7:], signature[:20]) {
-		return uu.Err(false, "Invalid token")
+		return uu.Err(false, "invalid token")
 	}
 
 	return nil

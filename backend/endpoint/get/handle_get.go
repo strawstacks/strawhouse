@@ -1,14 +1,14 @@
 package get
 
 import (
-	"backend/type/enum"
-	"backend/util/signature"
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/xattr"
+	"github.com/strawstacks/strawhouse/backend/type/enum"
+	"github.com/strawstacks/strawhouse/backend/util/signature"
 	"mime"
 	"net/url"
 	"os"

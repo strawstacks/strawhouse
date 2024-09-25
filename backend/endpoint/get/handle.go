@@ -1,9 +1,9 @@
 package get
 
 import (
-	"backend/common/config"
-	"backend/common/pogreb"
-	"backend/util/signature"
+	"github.com/strawstacks/strawhouse/backend/common/config"
+	"github.com/strawstacks/strawhouse/backend/common/pogreb"
+	"github.com/strawstacks/strawhouse/backend/util/signature"
 )
 
 type Handler struct {

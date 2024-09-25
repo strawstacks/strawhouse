@@ -1,4 +1,4 @@
-module command
+module github.com/strawstacks/strawhouse/command
 
 go 1.23.1
 
