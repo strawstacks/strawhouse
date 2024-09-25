@@ -18,7 +18,7 @@ type Config struct {
 
 func Init() *Config {
 	// * Parse arguments
-	path := flag.String("config", "/etc/strawhouse/backend/config.yml", "Path to config file")
+	path := flag.String("config", "/etc/strawhouse/backend/config.yaml", "Path to config file")
 	flag.Parse()
 
 	// * Declare struct
