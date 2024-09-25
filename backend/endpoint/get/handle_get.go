@@ -22,7 +22,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	path = filepath.Clean(path)
 	path, err := url.PathUnescape(path)
 	if err != nil {
-		return uu.Err(false, "Unable to decode path", err)
+		return uu.Err(false, "unable to decode path", err)
 	}
 	fpath := filepath.Join(*r.Config.DataRoot, path)
 	token := c.Query("t")
@@ -46,7 +46,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	// * Open the file
 	file, err := os.Open(fpath)
 	if err != nil {
-		return uu.Err(false, "Unable to open file", err)
+		return uu.Err(false, "unable to open file", err)
 	}
 	defer file.Close()
 
@@ -60,10 +60,19 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentType, contentType)
 	c.Set(fiber.HeaderContentLength, strconv.FormatInt(fileInfo.Size(), 10))
 
+	// * Check file flag
+	flag, err := xattr.Get(fpath, "sh.flag")
+	if err != nil {
+		return uu.Err(false, "unable to get file flag attributes", err)
+	}
+	if flag[0]&0b00001000 != 0 {
+		return uu.Err(false, "file corrupted")
+	}
+
 	// * Check file attribute
 	sum, err := xattr.Get(fpath, "sh.sum")
 	if err != nil {
-		return uu.Err(false, "unable to set file sum attributes", err)
+		return uu.Err(false, "unable to get file sum attributes", err)
 	}
 	signedSum, err := xattr.Get(fpath, "sh.sum.signed")
 	if err != nil {
@@ -72,18 +81,18 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 
 	// * Check file path
 	val, err := r.Pogreb.Sum.Get(sum)
-	if err != nil {
-		return uu.Err(false, "File not found", err)
+	if err != nil || val == nil {
+		return uu.Err(false, "file record not found")
 	}
 	if !bytes.Equal(val, []byte(path)) {
-		return uu.Err(false, "File path mismatch")
+		return uu.Err(false, "file path mismatch")
 	}
 
 	// * Validate the file
 	hash := r.Signature.GetHash()
 	hash.Write(sum)
 	if !bytes.Equal(hash.Sum(nil), signedSum) {
-		return uu.Err(false, "Invalid file signature")
+		return uu.Err(false, "invalid file signature")
 	}
 	r.Signature.PutHash(hash)
 
@@ -106,7 +115,9 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 
 	// * Check the hash
 	if !bytes.Equal(hash.Sum(nil), sum) {
-		return uu.Err(false, "Invalid file hash")
+		flag[0] |= 0b00001000
+		_ = xattr.Set(fpath, "sh.flag", flag)
+		return uu.Err(false, "invalid file hash")
 	}
 
 	return nil

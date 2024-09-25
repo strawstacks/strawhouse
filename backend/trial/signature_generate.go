@@ -22,7 +22,7 @@ func main() {
 	gob.Register(new(signature.ExampleAttribute))
 	_ = enc.Encode(attribute)
 
-	token := sign.Generate(1, enum.SignatureModeDirectory, enum.SignatureActionGet, 1, time.Now().Add(20*time.Minute), "/photo/2024", buffer.Bytes())
+	token := sign.Generate(1, enum.SignatureModeDirectory, enum.SignatureActionUpload, 1, time.Now().Add(20*time.Minute), "/photo/2024", buffer.Bytes())
 
 	// Encode attribute to base64
 	base64Attr := base64.StdEncoding.EncodeToString(buffer.Bytes())

@@ -16,7 +16,7 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	data := make([]byte, 27)
 	ln, err := base64.StdEncoding.Decode(data, []byte(token))
 	if err != nil || ln != 27 {
-		return uu.Err(false, "Malformed token")
+		return uu.Err(false, "malformed token")
 	}
 
 	// Extract data
@@ -29,17 +29,17 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 
 	// * Check version
 	if version != 1 {
-		return uu.Err(false, "Token version not supported")
+		return uu.Err(false, "token version not supported")
 	}
 
 	// * Check action
 	if act != action {
-		return uu.Err(false, "Invalid action")
+		return uu.Err(false, "invalid action")
 	}
 
 	// * Check expired
 	if time.Now().After(expired) {
-		return uu.Err(false, "Token expired")
+		return uu.Err(false, "token expired")
 	}
 
 	// * Reconstruct path

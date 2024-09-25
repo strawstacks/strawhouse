@@ -73,11 +73,23 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	sum := hash.Sum(nil)
 
 	// * Check hash
-	if result, err := r.Pogreb.Sum.Get(sum); err != nil {
+	if val, err := r.Pogreb.Sum.Get(sum); err != nil {
 		return uu.Err(false, "unable to check hash", err)
 	} else {
-		if result != nil {
-			return uu.Err(false, "file already exists", nil)
+		if val != nil {
+			pathVal := string(val)
+			if pathVal != relativePath {
+				return uu.Err(false, "file already exists in other path", nil)
+			}
+			if _, err := os.Stat(absolutePath); err == nil {
+				flag, err := xattr.Get(absolutePath, "sh.flag")
+				if err != nil {
+					return uu.Err(false, "unable to get file flag attributes", err)
+				}
+				if flag[0]&0b00001000 == 0 {
+					return uu.Err(false, "file is already exist", nil)
+				}
+			}
 		}
 	}
 
@@ -92,10 +104,17 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	signedSum := hash.Sum(nil)
 	r.Signature.PutHash(hash)
 
+	// Construct file attribute
+	flagBytes := make([]byte, 4)
+
 	// * Set file attributes
 	err = xattr.Set(absolutePath, "sh.sum", sum)
 	if err != nil {
 		return uu.Err(false, "unable to set file sum attributes", err)
+	}
+	err = xattr.Set(absolutePath, "sh.flag", flagBytes)
+	if err != nil {
+		return uu.Err(false, "unable to set file flag attributes", err)
 	}
 	err = xattr.Set(absolutePath, "sh.sum.signed", signedSum)
 	if err != nil {

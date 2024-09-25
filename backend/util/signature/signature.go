@@ -18,7 +18,7 @@ func Init(config *config.Config) *Signature {
 
 func New(key string) *Signature {
 	hashPool := &sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return hmac.New(sha256.New, []byte(key))
 		},
 	}

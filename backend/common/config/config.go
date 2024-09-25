@@ -12,7 +12,6 @@ type Config struct {
 	WebListen   [2]*string `yaml:"webListen" validate:"required"`
 	ProtoListen [2]*string `yaml:"protoListen" validate:"required"`
 	DataRoot    *string    `yaml:"dataRoot" validate:"dirpath"`
-	ObserveRoot *string    `yaml:"observeRoot" validate:"dirpath"`
 	PogrebPath  *string    `yaml:"pogrebPath" validate:"dirpath"`
 	Key         *string    `yaml:"key" validate:"required"`
 }
@@ -43,7 +42,6 @@ func Init() *Config {
 
 	// * Normalize config
 	*config.DataRoot, _ = filepath.Abs(*config.DataRoot)
-	*config.ObserveRoot, _ = filepath.Abs(*config.ObserveRoot)
 
 	return config
 }

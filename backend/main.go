@@ -27,8 +27,8 @@ func main() {
 			get.NewHandler,
 		),
 		fx.Invoke(
-			metadata.Init,
 			endpoint.Bind,
+			metadata.Init,
 		),
 	).Run()
 }
