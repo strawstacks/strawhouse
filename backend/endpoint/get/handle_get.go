@@ -61,7 +61,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentLength, strconv.FormatInt(fileInfo.Size(), 10))
 
 	// * Check file flag
-	flag, err := xattr.Get(fpath, "sh.flag")
+	flag, err := xattr.Get(fpath, "user.sh.flag")
 	if err != nil {
 		return uu.Err(false, "unable to get file flag attributes", err)
 	}
@@ -70,11 +70,11 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	}
 
 	// * Check file attribute
-	sum, err := xattr.Get(fpath, "sh.sum")
+	sum, err := xattr.Get(fpath, "user.sh.sum")
 	if err != nil {
 		return uu.Err(false, "unable to get file sum attributes", err)
 	}
-	signedSum, err := xattr.Get(fpath, "sh.sum.signed")
+	signedSum, err := xattr.Get(fpath, "user.sh.sum.signed")
 	if err != nil {
 		return uu.Err(false, "unable to set file signature attributes", err)
 	}
@@ -116,7 +116,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	// * Check the hash
 	if !bytes.Equal(hash.Sum(nil), sum) {
 		flag[0] |= 0b00001000
-		_ = xattr.Set(fpath, "sh.flag", flag)
+		_ = xattr.Set(fpath, "user.sh.flag", flag)
 		return uu.Err(false, "invalid file hash")
 	}
 

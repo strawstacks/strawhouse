@@ -59,6 +59,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 
 	// * Open file
 	file, err := fileHeader.Open()
+	defer file.Close()
 	if err != nil {
 		return uu.Err(false, "unable to open file", err)
 	}
@@ -85,7 +86,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 				return uu.Err(false, "file already exists in other path", nil)
 			}
 			if _, err := os.Stat(absolutePath); err == nil {
-				flag, err := xattr.Get(absolutePath, "sh.flag")
+				flag, err := xattr.Get(absolutePath, "user.sh.flag")
 				if err != nil {
 					return uu.Err(false, "unable to get file flag attributes", err)
 				}
@@ -111,15 +112,15 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	flagBytes := make([]byte, 4)
 
 	// * Set file attributes
-	err = xattr.Set(absolutePath, "sh.sum", sum)
+	err = xattr.Set(absolutePath, "user.sh.sum", sum)
 	if err != nil {
 		return uu.Err(false, "unable to set file sum attributes", err)
 	}
-	err = xattr.Set(absolutePath, "sh.flag", flagBytes)
+	err = xattr.Set(absolutePath, "user.sh.flag", flagBytes)
 	if err != nil {
 		return uu.Err(false, "unable to set file flag attributes", err)
 	}
-	err = xattr.Set(absolutePath, "sh.sum.signed", signedSum)
+	err = xattr.Set(absolutePath, "user.sh.sum.signed", signedSum)
 	if err != nil {
 		return uu.Err(false, "unable to set file signature attributes", err)
 	}

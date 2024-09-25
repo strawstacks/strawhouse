@@ -30,8 +30,8 @@ File server with HTTP and gRPC interface.
    ```yaml
    webListen: ["tcp", ":3000"]
    protoListen: ["tcp", ":3001"]
-   dataRoot: ./local/data/
-   pogrebPath: ./local/pogreb/
+   dataRoot: ./local/data/ # Recommended to use /var/lib/strawhouse/data/ for production
+   pogrebPath: ./local/pogreb/ # Recommended to use /var/lib/strawhouse/pogreb/ for production
    key: 6AnxPZy.... # base64-encoded 48 bytes key: `openssl rand -base64 48`
    ```
    Note:
@@ -49,15 +49,15 @@ File server with HTTP and gRPC interface.
 3. Choice 2: **Compile binary from source**
    ```bash
    go build -o ./local/backend ./backend
-   mv ./local/backend /usr/local/bin/strawhousebackd
-   strawhousebackd --config /etc/strawhouse/backend/config.yaml
+   sudo mv ./local/backend /usr/local/bin/strawhousebackd
+   sudo strawhousebackd --config /etc/strawhouse/backend/config.yaml
    ```
    
 4. Choice 3: **Download pre-built binary**
    ```bash
    sudo wget -O /usr/local/bin/strawhousebackd https://github.com/strawstacks/strawhouse/releases/download/v0.1.0/strawhousebackd_linux_arm64
    sudo chmod +x /usr/local/bin/strawhousebackd
-   strawhousebackd --config /etc/strawhouse/backend/config.yaml
+   sudo strawhousebackd --config /etc/strawhouse/backend/config.yaml
    ```
    
 5. **Using service manager**
@@ -65,7 +65,7 @@ File server with HTTP and gRPC interface.
    Create a service file `/etc/systemd/system/strawhousebackd.service`:
    ```ini
    [Unit]
-   Description=Strawhouse Backend Service
+   Description=Strawhouse Backend Daemon
    After=network.target
 
    [Service]
@@ -78,8 +78,8 @@ File server with HTTP and gRPC interface.
    ```
    Then run:
    ```bash
-   systemctl enable strawhousebackd
-   systemctl start strawhousebackd
+   sudo systemctl enable strawhousebackd
+   sudo systemctl start strawhousebackd
    ```
 
 Why not Docker?
@@ -94,12 +94,20 @@ go get -u github.com/strawstacks/strawhouse/driver
 ```
 
 ```go
+package main
+
+import (
+    "fmt"
+    "time"
+    "github.com/strawstacks/strawhouse/driver"
+    "github.com/strawstacks/strawhouse/backend/type/enum"
+)
+
 func main() {
    st := strawhouse.New("6AnxPZy....", "localhost:3001") // key, gRPC address
-   defer st.Close()
    
-   mode := strawhouse.SignatureModeFile // or strawhouse.SignatureModeDirectory
-   action := strawhouse.SignatureActionUpload // or strawhouse.SignatureActionGet
+   mode := enum.SignatureModeFile // or strawhouse.SignatureModeDirectory
+   action := enum.SignatureActionUpload // or strawhouse.SignatureActionGet
    depth := 2 // Only effect in get action: for path /a/b/c, depth of 2 means allow access all files under /a/b, for upload action, it's ignored and allow user to upload to /a/b/c only.
    expired := time.Now().Add(time.Duration(20) * time.Second) // 20 seconds
    path := "/a/b/c" // Relative path to dataRoot that grant user access
@@ -109,10 +117,11 @@ func main() {
 ```
 ### Command
 
-Command line tool to test and manage files.
+`strawc` is Strawhouse command line tool to test and manage files. Install using following command:
 
 ```bash
-go install github.com/strawstacks/strawhouse/command
+sudo wget -O /usr/local/bin/strawc https://github.com/strawstacks/strawhouse/releases/download/v0.1.0/strawc_darwin_amd64
+sudo chmod +x /usr/local/bin/strawc
 ```
 
 First time configuration:
@@ -123,8 +132,44 @@ strawc config --name server # Backend's gRPC address
 
 Sign token:
 ```bash
-strawc --action upload --depth 1 --expired 60 --mode dir --path photos/
+strawc sign --action upload --depth 1 --expired 60 --mode dir --path photos/
 ```
+
+## Usage
+
+### Upload file
+
+1. Using cURL
+   ```bash
+   curl --request POST \
+     --url http://localhost:3000/_/upload \
+     --header 'content-type: multipart/form-data' \
+     --form token=<generated-signed-token> \
+     --form file=@localfile.png \
+     --form destination=/test/
+   ```
+2. Custom RESTful API
+   - Method: `POST`
+   - Endpoint: Backend Address (e.g. `http://strawhouse.example.com` or `http://localhost:3000`) + `/_/upload`
+   - Body Type: `multipart/form-data`
+   - Body Fields:
+     - `token`: Generated signed token (see [Driver](#driver) or [Command](#command))
+     - `file`: File to upload (multipart file)
+     - `destination`: Destination path (e.g. `/test/`)
+
+   Example using file `localfile.png` to upload to `/test/`, the file will be stored at `/test/localfile.png`.
+
+### Get file
+
+1. Using cURL
+   ```bash
+   curl --request GET --url http://localhost:3000/path/to/file.png?t=<generated-signed-token>
+   ```
+   
+2. Custom RESTful API
+   - Method: `GET`
+   - Endpoint: Backend Address + `/path/to/file.png`
+   - Query: `t=<generated-signed-token>`
 
 ## Credits
 
