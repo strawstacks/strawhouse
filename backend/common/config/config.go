@@ -8,18 +8,13 @@ import (
 	"path/filepath"
 )
 
-type Client struct {
-	Name *string `yaml:"name" validate:"alphanum,lowercase,min=4,max=16"`
-	Key  *string `yaml:"key" validate:"base64,len=64"`
-}
-
 type Config struct {
 	WebListen   [2]*string `yaml:"webListen" validate:"required"`
 	ProtoListen [2]*string `yaml:"protoListen" validate:"required"`
 	DataRoot    *string    `yaml:"dataRoot" validate:"dirpath"`
 	ObserveRoot *string    `yaml:"observeRoot" validate:"dirpath"`
 	PogrebPath  *string    `yaml:"pogrebPath" validate:"dirpath"`
-	Clients     []*Client  `yaml:"clients"`
+	Key         *string    `yaml:"key" validate:"required"`
 }
 
 func Init() *Config {

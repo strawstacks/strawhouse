@@ -47,7 +47,12 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	if mode == enum.SignatureModeFile {
 		pathValue = []byte(path)
 	} else if mode == enum.SignatureModeDirectory {
-		pathValue = extractPathSlice(path, depth)
+		if action == enum.SignatureActionUpload {
+			pathValue = extractDirSlice(path)
+		}
+		if action == enum.SignatureActionGet {
+			pathValue = extractPathSlice(path, depth)
+		}
 	} else {
 		uu.Fatal("Invalid mode", nil)
 	}
@@ -55,13 +60,12 @@ func (r *Signature) Verify(act enum.SignatureAction, path string, attribute []by
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
 	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 27}
-	r.Hash.Reset()
-	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
-	r.Hash.Write(pathValue)
-	if action == enum.SignatureActionUpload {
-		r.Hash.Write(attribute)
-	}
-	signature := r.Hash.Sum(nil)
+	hash := r.GetHash()
+	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
+	hash.Write(pathValue)
+	hash.Write(attribute)
+	signature := hash.Sum(nil)
+	r.PutHash(hash)
 
 	// * Compare token
 	if !bytes.Equal(data[7:], signature[:20]) {

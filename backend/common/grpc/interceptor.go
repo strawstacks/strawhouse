@@ -11,12 +11,12 @@ import (
 
 func NewInterceptor(config *config.Config) *Interceptor {
 	return &Interceptor{
-		config: config,
+		Config: config,
 	}
 }
 
 type Interceptor struct {
-	config *config.Config
+	Config *config.Config
 }
 
 func (r *Interceptor) TokenAuthInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -27,18 +27,14 @@ func (r *Interceptor) TokenAuthInterceptor(ctx context.Context, req interface{},
 	}
 
 	// Extract the token from metadata
-	tokens := md["authorization"]
-	if len(tokens) == 0 {
+	key := md["authorization"]
+	if len(key) == 0 {
 		return nil, status.Error(codes.Unauthenticated, "authorization token not provided")
 	}
 
-	token := tokens[0]
-
 	// Validate the token
-	for _, client := range r.config.Clients {
-		if token == *client.Key {
-			return handler(ctx, req)
-		}
+	if key[0] == *r.Config.Key {
+		return handler(ctx, req)
 	}
 
 	// Unauthorized

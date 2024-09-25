@@ -58,13 +58,12 @@ func (r *Signature) Generate(version uint8, mode enum.SignatureMode, action enum
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
 	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 18}
-	r.Hash.Reset()
-	r.Hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
-	r.Hash.Write(pathSlice)
-	if action == enum.SignatureActionUpload {
-		r.Hash.Write(attribute)
-	}
-	signature := r.Hash.Sum(nil)
+	hash := r.GetHash()
+	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
+	hash.Write(pathSlice)
+	hash.Write(attribute)
+	signature := hash.Sum(nil)
+	r.PutHash(hash)
 	copy(data[7:], signature[:20])
 
 	// * Convert data to base64

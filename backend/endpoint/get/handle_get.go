@@ -3,9 +3,12 @@ package get
 import (
 	"backend/type/enum"
 	"backend/util/signature"
+	"bytes"
+	"crypto/sha256"
 	"encoding/base64"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pkg/xattr"
 	"mime"
 	"net/url"
 	"os"
@@ -55,9 +58,37 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 
 	// * Serve the file with the correct content type, skipping the first 64 bytes
 	c.Set(fiber.HeaderContentType, contentType)
-	c.Set(fiber.HeaderContentLength, strconv.FormatInt(fileInfo.Size()-64, 10))
+	c.Set(fiber.HeaderContentLength, strconv.FormatInt(fileInfo.Size(), 10))
 
-	// Stream file from 64th byte onward
+	// * Check file attribute
+	sum, err := xattr.Get(fpath, "sh.sum")
+	if err != nil {
+		return uu.Err(false, "unable to set file sum attributes", err)
+	}
+	signedSum, err := xattr.Get(fpath, "sh.sum.signed")
+	if err != nil {
+		return uu.Err(false, "unable to set file signature attributes", err)
+	}
+
+	// * Check file path
+	val, err := r.Pogreb.Sum.Get(sum)
+	if err != nil {
+		return uu.Err(false, "File not found", err)
+	}
+	if !bytes.Equal(val, []byte(path)) {
+		return uu.Err(false, "File path mismatch")
+	}
+
+	// * Validate the file
+	hash := r.Signature.GetHash()
+	hash.Write(sum)
+	if !bytes.Equal(hash.Sum(nil), signedSum) {
+		return uu.Err(false, "Invalid file signature")
+	}
+	r.Signature.PutHash(hash)
+
+	// * Initialize the hash
+	hash = sha256.New()
 	buffer := make([]byte, 1024)
 	for {
 		n, err := file.Read(buffer)
@@ -65,11 +96,17 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 			break
 		}
 		if n > 0 {
+			hash.Write(buffer[:n])
 			_, err := c.Write(buffer[:n])
 			if err != nil {
 				return uu.Err(false, err.Error())
 			}
 		}
+	}
+
+	// * Check the hash
+	if !bytes.Equal(hash.Sum(nil), sum) {
+		return uu.Err(false, "Invalid file hash")
 	}
 
 	return nil

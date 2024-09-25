@@ -24,6 +24,16 @@ func extractPathSlice(path string, depth uint32) []byte {
 	return unsafe.Slice(unsafe.StringData(path), len(path))
 }
 
+func extractDirSlice(path string) []byte {
+	for index := len(path) - 1; index >= 0; index-- {
+		if path[index] == '/' {
+			return unsafe.Slice(unsafe.StringData(path), index+1)
+		}
+	}
+
+	return nil
+}
+
 func ReplaceChar(str *string, oldChar, newChar rune) {
 	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
 		Data: (*reflect.StringHeader)(unsafe.Pointer(str)).Data,

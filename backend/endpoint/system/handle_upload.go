@@ -7,8 +7,10 @@ import (
 	"backend/util/signature"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/binary"
 	uu "github.com/bsthun/goutils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pkg/xattr"
 	"os"
 	"path/filepath"
 )
@@ -42,14 +44,14 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	relativePath := filepath.Clean(filepath.Join(destination, fileHeader.Filename))
 	absolutePath := filepath.Clean(filepath.Join(*r.Config.DataRoot, relativePath))
 
-	// * Ensure directory
-	if err := os.MkdirAll(directory, 0700); err != nil {
-		return uu.Err(false, "unable to create directory", err)
-	}
-
 	// * Check token
 	if err := r.Signature.Verify(enum.SignatureActionUpload, relativePath, attrib, token); err != nil {
 		return err
+	}
+
+	// * Ensure directory
+	if err := os.MkdirAll(directory, 0700); err != nil {
+		return uu.Err(false, "unable to create directory", err)
 	}
 
 	// * Open file
@@ -71,7 +73,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	sum := hash.Sum(nil)
 
 	// * Check hash
-	if result, err := r.Pogreb.Get(sum); err != nil {
+	if result, err := r.Pogreb.Sum.Get(sum); err != nil {
 		return uu.Err(false, "unable to check hash", err)
 	} else {
 		if result != nil {
@@ -82,6 +84,35 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	// * Save file
 	if err := c.SaveFile(fileHeader, absolutePath); err != nil {
 		return uu.Err(false, "unable to save file", err)
+	}
+
+	// * Sign hash
+	hash = r.Signature.GetHash()
+	hash.Write(sum)
+	signedSum := hash.Sum(nil)
+	r.Signature.PutHash(hash)
+
+	// * Set file attributes
+	err = xattr.Set(absolutePath, "sh.sum", sum)
+	if err != nil {
+		return uu.Err(false, "unable to set file sum attributes", err)
+	}
+	err = xattr.Set(absolutePath, "sh.sum.signed", signedSum)
+	if err != nil {
+		return uu.Err(false, "unable to set file signature attributes", err)
+	}
+
+	// * Save hash
+	if err := r.Pogreb.Sum.Put(sum, []byte(relativePath)); err != nil {
+		return uu.Err(false, "unable to save hash", err)
+	}
+
+	// * Save log
+	size := r.Pogreb.Log.Count()
+	sizeBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(sizeBytes, size)
+	if err := r.Pogreb.Log.Put(sizeBytes, sum); err != nil {
+		return uu.Err(false, "unable to save log", err)
 	}
 
 	// * Encode base64 hash
