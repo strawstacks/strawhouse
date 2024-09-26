@@ -99,7 +99,7 @@ package main
 import (
     "fmt"
     "time"
-    "github.com/strawstacks/strawhouse/strawhouse-driver/v1"
+    "github.com/strawstacks/strawhouse/strawhouse-driver"
 )
 
 func main() {

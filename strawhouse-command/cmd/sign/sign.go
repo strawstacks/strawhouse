@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/strawstacks/strawhouse/strawhouse-command/common"
+	"github.com/strawstacks/strawhouse/strawhouse-driver"
 	"log"
 	"strings"
 	"time"

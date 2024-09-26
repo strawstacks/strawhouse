@@ -5,11 +5,10 @@ go 1.23.1
 require (
 	github.com/akrylysov/pogreb v0.10.2
 	github.com/bsthun/goutils v1.0.2
-	github.com/davecgh/go-spew v1.1.1
-	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/pkg/xattr v0.4.10
+	github.com/strawstacks/strawhouse/strawhouse-proto v0.0.0-20240926093904-bf80ea783f43
 	go.uber.org/fx v1.22.2
 	google.golang.org/grpc v1.67.0
 	gopkg.in/yaml.v3 v3.0.1

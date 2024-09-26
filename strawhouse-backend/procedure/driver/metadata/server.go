@@ -2,8 +2,8 @@ package metadata
 
 import (
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
+	"github.com/strawstacks/strawhouse/strawhouse-proto/pb"
 	"google.golang.org/grpc"
-	"proto/pb"
 )
 
 type Server struct {
