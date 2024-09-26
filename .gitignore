@@ -1,9 +1,6 @@
 # Local
 /local
 
-# Output
-/proto/pb
-
 # Editor
 .vscode/
 .idea/

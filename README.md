@@ -43,12 +43,12 @@ File server with HTTP and gRPC interface.
    ```bash
    git clone https://github.com/strawstacks/strawhouse.git
    cd strawhouse/
-   go run ./backend --config ./local/config.yaml
+   go run ./strawhouse-backend --config ./local/config.yaml
    ```
 
 3. Choice 2: **Compile binary from source**
    ```bash
-   go build -o ./local/backend ./backend
+   go build -o ./local/backend ./strawhouse-backend
    sudo mv ./local/backend /usr/local/bin/strawhousebackd
    sudo strawhousebackd --config /etc/strawhouse/backend/config.yaml
    ```
@@ -99,15 +99,14 @@ package main
 import (
     "fmt"
     "time"
-    "github.com/strawstacks/strawhouse/driver"
-    "github.com/strawstacks/strawhouse/backend/type/enum"
+    "github.com/strawstacks/strawhouse/strawhouse-driver/v1"
 )
 
 func main() {
    st := strawhouse.New("6AnxPZy....", "localhost:3001") // key, gRPC address
    
-   mode := enum.SignatureModeFile // or strawhouse.SignatureModeDirectory
-   action := enum.SignatureActionUpload // or strawhouse.SignatureActionGet
+   mode := strawhouse.SignatureModeFile // or strawhouse.SignatureModeDirectory
+   action := strawhouse.SignatureActionUpload // or strawhouse.SignatureActionGet
    depth := 2 // Only effect in get action: for path /a/b/c, depth of 2 means allow access all files under /a/b, for upload action, it's ignored and allow user to upload to /a/b/c only.
    expired := time.Now().Add(time.Duration(20) * time.Second) // 20 seconds
    path := "/a/b/c" // Relative path to dataRoot that grant user access
@@ -126,8 +125,8 @@ sudo chmod +x /usr/local/bin/strawc
 
 First time configuration:
 ```bash
-strawc config --name key # Backend's key
-strawc config --name server # Backend's gRPC address
+strawc config set --name key # Backend's key
+strawc config set --name server # Backend's gRPC address
 ```
 
 Sign token:
@@ -150,7 +149,7 @@ strawc sign --action upload --depth 1 --expired 60 --mode dir --path photos/
    ```
 2. Custom RESTful API
    - Method: `POST`
-   - Endpoint: Backend Address (e.g. `http://strawhouse.example.com` or `http://localhost:3000`) + `/_/upload`
+   - Endpoint: Backend Address (e.g. `https://strawhouse.example.com` or `http://localhost:3000`) + `/_/upload`
    - Body Type: `multipart/form-data`
    - Body Fields:
      - `token`: Generated signed token (see [Driver](#driver) or [Command](#command))
