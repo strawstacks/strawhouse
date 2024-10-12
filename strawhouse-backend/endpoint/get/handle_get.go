@@ -33,7 +33,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	attrBytes, err := base64.StdEncoding.DecodeString(attr)
 
 	// * Verify the file
-	if err := r.Signature.Verify(strawhouse.SignatureActionGet, path, attrBytes, token); err != nil {
+	if err := r.Signature.VerifyInt(strawhouse.SignatureActionGet, path, attrBytes, token); err != nil {
 		return err
 	}
 
@@ -48,7 +48,9 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	if err != nil {
 		return gut.Err(false, "unable to open file", err)
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	// * Detect content type from file extension
 	contentType := mime.TypeByExtension(filepath.Ext(fpath))

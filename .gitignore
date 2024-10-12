@@ -2,6 +2,9 @@
 /.local
 /.env
 
+# Build
+/strawhouse-proto/pb
+
 # Editor
 .vscode/
 .idea/

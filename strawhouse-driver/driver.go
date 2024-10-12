@@ -1,14 +1,20 @@
 package strawhouse
 
 type Driver struct {
-	Server    string
-	Signature *Signature
+	Signature Signaturer
+	Client    Clienter
 }
 
 func New(key string, server string) *Driver {
 	sgn := NewSignature(key)
+	cnt := NewClient(key, server)
+
 	return &Driver{
-		Server:    server,
 		Signature: sgn,
+		Client:    cnt,
 	}
+}
+
+func (r *Driver) Close() {
+	_ = r.Client.Close()
 }

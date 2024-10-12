@@ -5,7 +5,13 @@ import (
 	"crypto/sha256"
 	"hash"
 	"sync"
+	"time"
 )
+
+type Signaturer interface {
+	Generate(version uint8, mode SignatureMode, action SignatureAction, depth uint32, expired time.Time, path string, attribute []byte) (token string)
+	Verify(act SignatureAction, path string, attribute []byte, token string) (err error)
+}
 
 type Signature struct {
 	HashPool *sync.Pool

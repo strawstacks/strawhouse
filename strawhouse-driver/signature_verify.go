@@ -9,7 +9,11 @@ import (
 	"unsafe"
 )
 
-func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, token string) *gut.ErrorInstance {
+func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, token string) error {
+	return r.VerifyInt(act, path, attribute, token)
+}
+
+func (r *Signature) VerifyInt(act SignatureAction, path string, attribute []byte, token string) *gut.ErrorInstance {
 	// * Reconstruct data
 	r.ReplaceUnclean(&token)
 	data := make([]byte, 27)

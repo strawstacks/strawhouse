@@ -48,7 +48,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	absolutePath := filepath.Clean(filepath.Join(*r.Config.DataRoot, relativePath))
 
 	// * Check token
-	if err := r.Signature.Verify(strawhouse.SignatureActionUpload, relativePath, attrib, token); err != nil {
+	if err := r.Signature.VerifyInt(strawhouse.SignatureActionUpload, relativePath, attrib, token); err != nil {
 		return err
 	}
 
@@ -59,7 +59,9 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 
 	// * Open file
 	file, err := fileHeader.Open()
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 	if err != nil {
 		return gut.Err(false, "unable to open file", err)
 	}
