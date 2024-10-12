@@ -1,0 +1,52 @@
+name: Sync driver repo
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout original strawhouse repo
+      - name: Checkout strawhouse repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensures fetching the tag information
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      # Step 3: Install dependencies
+      - name: Install protoc
+        run: |
+          sudo apt-get update > /dev/null
+          sudo apt-get install -y protobuf-compiler tree > /dev/null
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          export PATH="$PATH:$(go env GOPATH)/bin"
+
+      # Step 4: Sync driver to strawhouse-go
+      - name: Sync driver to strawhouse-go
+        run: |
+          rm -r .git
+          git clone https://github.com/strawstacks/strawhouse-go.git
+          find strawhouse-go -mindepth 1 ! -path '*/.git*' ! -path '*.md' -exec rm -rf {} +
+          cp -r strawhouse-driver/* strawhouse-go
+          sed -i 's/strawhouse-driver/strawhouse-go/g' strawhouse-go/go.mod
+          mkdir -p strawhouse-go/pb
+          protoc --go_out=./strawhouse-go --go-grpc_out=./strawhouse-go ./strawhouse-proto/**/*.proto
+
+      # Step 5: Push changes to strawhouse-go
+      - name: Push changes to strawhouse-go
+        run: |
+          cd strawhouse-go
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Sync driver on strawhouse tag ${{ github.ref_name }}"
+          git push https://bsthun:${{ secrets.PAT_TOKEN }}@github.com/strawstacks/strawhouse-go.git main

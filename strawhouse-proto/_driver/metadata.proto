@@ -4,8 +4,6 @@ package proto;
 
 option go_package = "./pb";
 
-import "google/protobuf/empty.proto";
-
 service DriverMetadata {
   rpc DirectoryList(DirectoryListRequest) returns (DirectoryListResponse);
 }
