@@ -3,19 +3,19 @@ package strawhouse
 import (
 	"bytes"
 	"encoding/base64"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"reflect"
 	"time"
 	"unsafe"
 )
 
-func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, token string) *uu.ErrorInstance {
+func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, token string) *gut.ErrorInstance {
 	// * Reconstruct data
-	r.ReplaceChar(&token, '*', '+')
+	r.ReplaceUnclean(&token)
 	data := make([]byte, 27)
 	ln, err := base64.StdEncoding.Decode(data, []byte(token))
 	if err != nil || ln != 27 {
-		return uu.Err(false, "malformed token")
+		return gut.Err(false, "malformed token")
 	}
 
 	// Extract data
@@ -28,17 +28,17 @@ func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, t
 
 	// * Check version
 	if version != 1 {
-		return uu.Err(false, "token version not supported")
+		return gut.Err(false, "token version not supported")
 	}
 
 	// * Check action
 	if act != action {
-		return uu.Err(false, "invalid action")
+		return gut.Err(false, "invalid action")
 	}
 
 	// * Check expired
 	if time.Now().After(expired) {
-		return uu.Err(false, "token expired")
+		return gut.Err(false, "token expired")
 	}
 
 	// * Reconstruct path
@@ -53,7 +53,7 @@ func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, t
 			pathValue = r.extractPathSlice(path, depth)
 		}
 	} else {
-		uu.Fatal("invalid mode", nil)
+		gut.Fatal("invalid mode", nil)
 	}
 
 	// * Sign data
@@ -68,7 +68,7 @@ func (r *Signature) Verify(act SignatureAction, path string, attribute []byte, t
 
 	// * Compare token
 	if !bytes.Equal(data[7:], signature[:20]) {
-		return uu.Err(false, "invalid token")
+		return gut.Err(false, "invalid token")
 	}
 
 	return nil

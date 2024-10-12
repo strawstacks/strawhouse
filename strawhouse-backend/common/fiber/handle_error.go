@@ -2,10 +2,10 @@ package fiber
 
 import (
 	"errors"
+	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/type/response"
 	"strings"
 
-	uu "github.com/bsthun/goutils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,7 +22,7 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 	}
 
 	// Case of ErrorInstance
-	var respErr *uu.ErrorInstance
+	var respErr *gut.ErrorInstance
 	if errors.As(err, &respErr) {
 		block := respErr.Errors[len(respErr.Errors)-1]
 		if block.Err != nil {

@@ -2,7 +2,7 @@ package fiber
 
 import (
 	"context"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"go.uber.org/fx"
@@ -22,7 +22,7 @@ func Init(lc fx.Lifecycle, config *config.Config) *fiber.App {
 			go func() {
 				err := app.Listen(*config.WebListen[1])
 				if err != nil {
-					uu.Fatal("Unable to listen", err)
+					gut.Fatal("Unable to listen", err)
 				}
 			}()
 			return nil

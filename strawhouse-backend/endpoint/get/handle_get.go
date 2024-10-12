@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pkg/xattr"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/util/signature"
@@ -22,7 +22,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	path = filepath.Clean(path)
 	path, err := url.PathUnescape(path)
 	if err != nil {
-		return uu.Err(false, "unable to decode path", err)
+		return gut.Err(false, "unable to decode path", err)
 	}
 	fpath := filepath.Join(*r.Config.DataRoot, path)
 	token := c.Query("t")
@@ -40,13 +40,13 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	// * Check if path is a directory
 	fileInfo, err := os.Stat(fpath)
 	if err != nil || fileInfo.IsDir() {
-		return uu.Err(false, "File not found")
+		return gut.Err(false, "File not found")
 	}
 
 	// * Open the file
 	file, err := os.Open(fpath)
 	if err != nil {
-		return uu.Err(false, "unable to open file", err)
+		return gut.Err(false, "unable to open file", err)
 	}
 	defer file.Close()
 
@@ -63,36 +63,36 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	// * Check file flag
 	flag, err := xattr.Get(fpath, "user.sh.flag")
 	if err != nil {
-		return uu.Err(false, "unable to get file flag attributes", err)
+		return gut.Err(false, "unable to get file flag attributes", err)
 	}
 	if flag[0]&0b00001000 != 0 {
-		return uu.Err(false, "file corrupted")
+		return gut.Err(false, "file corrupted")
 	}
 
 	// * Check file attribute
 	sum, err := xattr.Get(fpath, "user.sh.sum")
 	if err != nil {
-		return uu.Err(false, "unable to get file sum attributes", err)
+		return gut.Err(false, "unable to get file sum attributes", err)
 	}
 	signedSum, err := xattr.Get(fpath, "user.sh.sum.signed")
 	if err != nil {
-		return uu.Err(false, "unable to set file signature attributes", err)
+		return gut.Err(false, "unable to set file signature attributes", err)
 	}
 
 	// * Check file path
 	val, err := r.Pogreb.Sum.Get(sum)
 	if err != nil || val == nil {
-		return uu.Err(false, "file record not found")
+		return gut.Err(false, "file record not found")
 	}
 	if !bytes.Equal(val, []byte(path)) {
-		return uu.Err(false, "file path mismatch")
+		return gut.Err(false, "file path mismatch")
 	}
 
 	// * Validate the file
 	hash := r.Signature.GetHash()
 	hash.Write(sum)
 	if !bytes.Equal(hash.Sum(nil), signedSum) {
-		return uu.Err(false, "invalid file signature")
+		return gut.Err(false, "invalid file signature")
 	}
 	r.Signature.PutHash(hash)
 
@@ -108,7 +108,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 			hash.Write(buffer[:n])
 			_, err := c.Write(buffer[:n])
 			if err != nil {
-				return uu.Err(false, err.Error())
+				return gut.Err(false, err.Error())
 			}
 		}
 	}
@@ -117,7 +117,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	if !bytes.Equal(hash.Sum(nil), sum) {
 		flag[0] |= 0b00001000
 		_ = xattr.Set(fpath, "user.sh.flag", flag)
-		return uu.Err(false, "invalid file hash")
+		return gut.Err(false, "invalid file hash")
 	}
 
 	return nil

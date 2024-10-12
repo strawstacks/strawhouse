@@ -3,7 +3,7 @@ package pogreb
 import (
 	"context"
 	"github.com/akrylysov/pogreb"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"go.uber.org/fx"
 	"path/filepath"
@@ -24,12 +24,12 @@ func Init(lc fx.Lifecycle, config *config.Config) *Pogreb {
 
 	sumDb, err := pogreb.Open(filepath.Join(*config.PogrebPath, "sum"), options)
 	if err != nil {
-		uu.Fatal("pogreb sumdb error", err)
+		gut.Fatal("pogreb sumdb error", err)
 	}
 
 	logDb, err := pogreb.Open(filepath.Join(*config.PogrebPath, "log"), options)
 	if err != nil {
-		uu.Fatal("pogreb logdb error", err)
+		gut.Fatal("pogreb logdb error", err)
 	}
 
 	lc.Append(fx.Hook{

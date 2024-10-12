@@ -2,7 +2,7 @@ package strawhouse
 
 import (
 	"encoding/base64"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"reflect"
 	"strconv"
 	"time"
@@ -31,14 +31,14 @@ func (r *Signature) Generate(version uint8, mode SignatureMode, action Signature
 		}
 		data[1] |= byte(depth)
 	} else {
-		uu.Fatal("Invalid mode: "+strconv.Itoa(int(mode)), nil)
+		gut.Fatal("Invalid mode: "+strconv.Itoa(int(mode)), nil)
 	}
 	if action == SignatureActionGet {
 		data[1] &= 0b10111111
 	} else if action == SignatureActionUpload {
 		data[1] |= 0b01000000
 	} else {
-		uu.Fatal("Invalid action: "+strconv.Itoa(int(action)), nil)
+		gut.Fatal("Invalid action: "+strconv.Itoa(int(action)), nil)
 	}
 
 	// * Add expired time 5 bytes
@@ -69,6 +69,6 @@ func (r *Signature) Generate(version uint8, mode SignatureMode, action Signature
 	base64buffer := make([]byte, 36)
 	base64.StdEncoding.Encode(base64buffer, data)
 	encoded := string(base64buffer[:])
-	r.ReplaceChar(&encoded, '+', '*')
+	r.ReplaceClean(&encoded)
 	return encoded
 }

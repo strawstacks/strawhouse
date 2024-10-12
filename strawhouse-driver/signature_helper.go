@@ -34,16 +34,32 @@ func (r *Signature) extractDirSlice(path string) []byte {
 	return nil
 }
 
-func (r *Signature) ReplaceChar(str *string, oldChar, newChar rune) {
+func (r *Signature) ReplaceClean(str *string) {
 	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
 		Data: (*reflect.StringHeader)(unsafe.Pointer(str)).Data,
 		Len:  len(*str),
 	}))
-
-	// Iterate through the byte slice and replace the old character with the new one
 	for i := 0; i < len(*byteSlice); i++ {
-		if (*byteSlice)[i] == byte(oldChar) {
-			(*byteSlice)[i] = byte(newChar)
+		if (*byteSlice)[i] == '+' {
+			(*byteSlice)[i] = '-'
+		}
+		if (*byteSlice)[i] == '/' {
+			(*byteSlice)[i] = '_'
+		}
+	}
+}
+
+func (r *Signature) ReplaceUnclean(str *string) {
+	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
+		Data: (*reflect.StringHeader)(unsafe.Pointer(str)).Data,
+		Len:  len(*str),
+	}))
+	for i := 0; i < len(*byteSlice); i++ {
+		if (*byteSlice)[i] == '-' {
+			(*byteSlice)[i] = '+'
+		}
+		if (*byteSlice)[i] == '_' {
+			(*byteSlice)[i] = '/'
 		}
 	}
 }

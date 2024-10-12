@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
@@ -24,10 +24,10 @@ func Init(lc fx.Lifecycle, config *config.Config) *grpc.Server {
 			go func() {
 				lis, err := net.Listen(*config.ProtoListen[0], *config.ProtoListen[1])
 				if err != nil {
-					uu.Fatal("Unable to listen", err)
+					gut.Fatal("Unable to listen", err)
 				}
 				if err := grpcServer.Serve(lis); err != nil {
-					uu.Fatal("Unable to serve", err)
+					gut.Fatal("Unable to serve", err)
 				}
 			}()
 			return nil

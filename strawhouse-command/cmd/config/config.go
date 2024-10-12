@@ -3,7 +3,7 @@ package config
 import (
 	"bufio"
 	"fmt"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/strawstacks/strawhouse/strawhouse-command/common"
@@ -22,7 +22,7 @@ var setCmd = &cobra.Command{
 	Short: "Set a config key and value",
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
-		if err := uu.Validator.Var(name, "oneof=server key"); err != nil {
+		if err := gut.Validator.Var(name, "oneof=server key"); err != nil {
 			log.Fatalf("name is required one of 'server' or 'key'")
 		}
 
@@ -30,7 +30,7 @@ var setCmd = &cobra.Command{
 		fmt.Printf("enter %s value: ", name)
 		value, _ := reader.ReadString('\n')
 		value = strings.Replace(value, "\n", "", -1)
-		if err := uu.Validator.Var(value, "required"); err != nil {
+		if err := gut.Validator.Var(value, "required"); err != nil {
 			log.Fatalf("value is required for key")
 		}
 

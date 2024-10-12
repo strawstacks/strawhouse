@@ -3,7 +3,7 @@ module github.com/strawstacks/strawhouse/strawhouse-driver
 go 1.23.1
 
 require (
-	github.com/bsthun/goutils v1.0.2
+	github.com/bsthun/gut v1.1.0
 	github.com/go-playground/assert/v2 v2.2.0
 )
 

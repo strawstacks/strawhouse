@@ -3,7 +3,7 @@ package strawhouse
 import (
 	"bytes"
 	"encoding/gob"
-	uu "github.com/bsthun/goutils"
+	"github.com/bsthun/gut"
 	"testing"
 	"time"
 )
@@ -11,8 +11,8 @@ import (
 func Prepare() (*Signature, []byte) {
 	signature := NewSignature("secret")
 	attribute := &ExampleAttribute{
-		UploaderId:  uu.Ptr[uint64](20),
-		SessionName: uu.Ptr("abcd"),
+		UploaderId:  gut.Ptr[uint64](20),
+		SessionName: gut.Ptr("abcd"),
 	}
 	var buffer bytes.Buffer
 	enc := gob.NewEncoder(&buffer)
