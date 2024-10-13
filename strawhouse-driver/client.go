@@ -9,15 +9,19 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const GrpcMaxMessageSize = 1024 * 1024 * 1024 * 1024 * 1024 // 1 PB
+
 type Clienter interface {
 	Close() error
 	DirectoryList(directory string) (*pb.DirectoryListResponse, error)
+	FeedUpload(directory string, callback func(resp *pb.UploadFeedResponse, err error)) (*FeedUploadSession, error)
 }
 
 type Client struct {
 	Grpc                 *grpc.ClientConn
 	driverMetadataClient pb.DriverMetadataClient
 	driverTransferClient pb.DriverTransferClient
+	driverFeedClient     pb.DriverFeedClient
 }
 
 func NewClient(key string, server string) *Client {
@@ -25,6 +29,10 @@ func NewClient(key string, server string) *Client {
 		server,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(UnaryInterceptor(key)),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(GrpcMaxMessageSize),
+			grpc.MaxCallSendMsgSize(GrpcMaxMessageSize),
+		),
 	)
 	if err != nil {
 		gut.Fatal("grpc failure", err)
@@ -32,11 +40,13 @@ func NewClient(key string, server string) *Client {
 
 	driverMetadataClient := pb.NewDriverMetadataClient(gr)
 	driverTransferClient := pb.NewDriverTransferClient(gr)
+	driverFeedClient := pb.NewDriverFeedClient(gr)
 
 	return &Client{
 		Grpc:                 gr,
 		driverMetadataClient: driverMetadataClient,
 		driverTransferClient: driverTransferClient,
+		driverFeedClient:     driverFeedClient,
 	}
 }
 

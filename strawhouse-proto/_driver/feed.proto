@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pb";
+
+service DriverFeed {
+  rpc Upload(UploadFeedRequest) returns (stream UploadFeedResponse);
+}
+
+message UploadFeedRequest {
+  string directory = 1;
+}
+
+message UploadFeedResponse {
+  string name = 1;
+  string directory = 2;
+  string hash = 3;
+  bytes attr = 4;
+}

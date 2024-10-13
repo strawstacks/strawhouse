@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
+	"github.com/strawstacks/strawhouse/strawhouse-driver"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"net"
@@ -16,6 +17,8 @@ func Init(lc fx.Lifecycle, config *config.Config) *grpc.Server {
 	// * Initialize gRPC server
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.TokenAuthInterceptor),
+		grpc.MaxRecvMsgSize(strawhouse.GrpcMaxMessageSize),
+		grpc.MaxSendMsgSize(strawhouse.GrpcMaxMessageSize),
 	)
 
 	// * Append lifecycle hook

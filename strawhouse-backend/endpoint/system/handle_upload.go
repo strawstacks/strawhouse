@@ -8,7 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/type/payload"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/type/response"
+	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
 	"github.com/strawstacks/strawhouse/strawhouse-driver"
+	"github.com/strawstacks/strawhouse/strawhouse-proto/pb"
 	"os"
 	"path/filepath"
 )
@@ -101,7 +103,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return gut.Err(false, "unable to save file", err)
 	}
 
-	// Construct file attribute
+	// Construct file flag
 	if er := r.Fileflag.CorruptedInit(relativePath); er != nil {
 		return er
 	}
@@ -123,6 +125,14 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	encodedSum := base64.StdEncoding.EncodeToString(sum)
 	encodedSum = encodedSum[:len(encodedSum)-1]
 	r.Signature.ReplaceClean(&encodedSum)
+
+	// * Fire event feed
+	r.EventFeed.Fire(eventfeed.FeedTypeUpload, relativePath, &pb.UploadFeedResponse{
+		Name:      fileHeader.Filename,
+		Directory: destination,
+		Hash:      encodedSum,
+		Attr:      attrib,
+	})
 
 	return c.JSON(response.Success(&payload.UploadResponse{
 		Path: gut.Ptr(relativePath),
