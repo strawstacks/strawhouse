@@ -6,10 +6,8 @@ import (
 	"encoding/binary"
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
-	"github.com/pkg/xattr"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/type/payload"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/type/response"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/signature"
 	"github.com/strawstacks/strawhouse/strawhouse-driver"
 	"os"
 	"path/filepath"
@@ -29,7 +27,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	}
 	var attrib []byte
 	if attribute != "" {
-		signature.ReplaceChar(&attribute, '+', '*')
+		r.Signature.ReplaceUnclean(&attribute)
 		attrib, err = base64.StdEncoding.DecodeString(attribute)
 		if err != nil {
 			return gut.Err(false, "unable to decode attribute", err)
@@ -37,7 +35,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 	}
 
 	// * Check file name
-	fileHeader.Filename = r.Name.BaseName(fileHeader.Filename)
+	fileHeader.Filename = r.Filepath.BaseName(fileHeader.Filename)
 	if len(fileHeader.Filename) == 0 {
 		return gut.Err(false, "invalid filename", nil)
 	}
@@ -83,16 +81,15 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return gut.Err(false, "unable to check hash", err)
 	} else {
 		if val != nil {
+			// Check if file already exists in other path
 			pathVal := string(val)
 			if pathVal != relativePath {
 				return gut.Err(false, "file already exists in other path", nil)
 			}
+
+			// If file exists and not corrupted, deny upload
 			if _, err := os.Stat(absolutePath); err == nil {
-				flag, err := xattr.Get(absolutePath, "user.sh.flag")
-				if err != nil {
-					return gut.Err(false, "unable to get file flag attributes", err)
-				}
-				if flag[0]&0b00001000 == 0 {
+				if er := r.Fileflag.Corrupted(relativePath); er == nil {
 					return gut.Err(false, "file is already exist", nil)
 				}
 			}
@@ -104,27 +101,9 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		return gut.Err(false, "unable to save file", err)
 	}
 
-	// * Sign hash
-	hash = r.Signature.GetHash()
-	hash.Write(sum)
-	signedSum := hash.Sum(nil)
-	r.Signature.PutHash(hash)
-
 	// Construct file attribute
-	flagBytes := make([]byte, 4)
-
-	// * Set file attributes
-	err = xattr.Set(absolutePath, "user.sh.sum", sum)
-	if err != nil {
-		return gut.Err(false, "unable to set file sum attributes", err)
-	}
-	err = xattr.Set(absolutePath, "user.sh.flag", flagBytes)
-	if err != nil {
-		return gut.Err(false, "unable to set file flag attributes", err)
-	}
-	err = xattr.Set(absolutePath, "user.sh.sum.signed", signedSum)
-	if err != nil {
-		return gut.Err(false, "unable to set file signature attributes", err)
+	if er := r.Fileflag.CorruptedInit(relativePath); er != nil {
+		return er
 	}
 
 	// * Save hash
@@ -142,6 +121,8 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 
 	// * Encode base64 hash
 	encodedSum := base64.StdEncoding.EncodeToString(sum)
+	encodedSum = encodedSum[:len(encodedSum)-1]
+	r.Signature.ReplaceClean(&encodedSum)
 
 	return c.JSON(response.Success(&payload.UploadResponse{
 		Path: gut.Ptr(relativePath),

@@ -1,12 +1,12 @@
-package name
+package filepath
 
 import (
 	"strings"
 	"unicode"
 )
 
-func (r *Name) BaseName(filepath string) string {
-	filepath = r.HarmfulRegexp.ReplaceAllString(filepath, "_")
+func (r *Filepath) BaseName(filepath string) string {
+	filepath = r.val.harmfulRegexp.ReplaceAllString(filepath, "_")
 	filepath = strings.Trim(filepath, ".")
 	filepath = strings.Map(func(r rune) rune {
 		if unicode.IsSpace(r) {
@@ -17,6 +17,6 @@ func (r *Name) BaseName(filepath string) string {
 		}
 		return -1
 	}, filepath)
-	filepath = r.ConsecRegexp.ReplaceAllString(filepath, "_")
+	filepath = r.val.consecRegexp.ReplaceAllString(filepath, "_")
 	return filepath
 }

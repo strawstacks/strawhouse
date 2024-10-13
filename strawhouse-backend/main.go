@@ -9,7 +9,8 @@ import (
 	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/get"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/system"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/metadata"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/name"
+	"github.com/strawstacks/strawhouse/strawhouse-backend/util/fileflag"
+	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/util/signature"
 	"go.uber.org/fx"
 )
@@ -21,7 +22,8 @@ func main() {
 			pogreb.Init,
 			fiber.Init,
 			grpc.Init,
-			name.Init,
+			filepath.Init,
+			fileflag.Init,
 			signature.Init,
 			system.NewHandler,
 			get.NewHandler,

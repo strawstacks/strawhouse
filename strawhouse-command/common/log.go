@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/bsthun/gut"
 )
 
@@ -14,5 +15,5 @@ func Handle(data any, er error) {
 	if err != nil {
 		gut.Fatal("Unable to marshal error", err)
 	}
-	gut.Debug("\n" + string(bytes))
+	fmt.Println(string(bytes))
 }

@@ -49,6 +49,5 @@ var setCmd = &cobra.Command{
 func init() {
 	setCmd.Flags().String("name", "", "Key to set. One of 'server' or 'key'")
 	_ = setCmd.MarkFlagRequired("name")
-	_ = setCmd.MarkFlagRequired("value")
 	Cmd.AddCommand(setCmd)
 }

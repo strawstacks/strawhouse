@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
-	"github.com/pkg/xattr"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/signature"
 	"github.com/strawstacks/strawhouse/strawhouse-driver"
 	"mime"
 	"net/url"
@@ -29,28 +27,19 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	attr := c.Query("a")
 
 	// * Decode attributes
-	signature.ReplaceChar(&attr, '*', '+')
+	r.Signature.ReplaceClean(&attr)
 	attrBytes, err := base64.StdEncoding.DecodeString(attr)
 
 	// * Verify the file
-	if err := r.Signature.VerifyInt(strawhouse.SignatureActionGet, path, attrBytes, token); err != nil {
-		return err
+	if er := r.Signature.VerifyInt(strawhouse.SignatureActionGet, path, attrBytes, token); er != nil {
+		return er
 	}
 
 	// * Check if path is a directory
 	fileInfo, err := os.Stat(fpath)
 	if err != nil || fileInfo.IsDir() {
-		return gut.Err(false, "File not found")
+		return gut.Err(false, "file not found")
 	}
-
-	// * Open the file
-	file, err := os.Open(fpath)
-	if err != nil {
-		return gut.Err(false, "unable to open file", err)
-	}
-	defer func() {
-		_ = file.Close()
-	}()
 
 	// * Detect content type from file extension
 	contentType := mime.TypeByExtension(filepath.Ext(fpath))
@@ -58,27 +47,19 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 		contentType = "text/plain"
 	}
 
-	// * Serve the file with the correct content type, skipping the first 64 bytes
+	// * Serve the file with the correct content type
 	c.Set(fiber.HeaderContentType, contentType)
 	c.Set(fiber.HeaderContentLength, strconv.FormatInt(fileInfo.Size(), 10))
 
-	// * Check file flag
-	flag, err := xattr.Get(fpath, "user.sh.flag")
-	if err != nil {
-		return gut.Err(false, "unable to get file flag attributes", err)
-	}
-	if flag[0]&0b00001000 != 0 {
-		return gut.Err(false, "file corrupted")
+	// * Check file corruption
+	if er := r.Fileflag.Corrupted(path); er != nil {
+		return er
 	}
 
-	// * Check file attribute
-	sum, err := xattr.Get(fpath, "user.sh.sum")
-	if err != nil {
-		return gut.Err(false, "unable to get file sum attributes", err)
-	}
-	signedSum, err := xattr.Get(fpath, "user.sh.sum.signed")
-	if err != nil {
-		return gut.Err(false, "unable to set file signature attributes", err)
+	// * Check signed checksum
+	sum, er := r.Fileflag.SumGet(path)
+	if er != nil {
+		return er
 	}
 
 	// * Check file path
@@ -90,16 +71,17 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 		return gut.Err(false, "file path mismatch")
 	}
 
-	// * Validate the file
-	hash := r.Signature.GetHash()
-	hash.Write(sum)
-	if !bytes.Equal(hash.Sum(nil), signedSum) {
-		return gut.Err(false, "invalid file signature")
+	// * Open the file
+	file, err := os.Open(fpath)
+	if err != nil {
+		return gut.Err(false, "unable to open file", err)
 	}
-	r.Signature.PutHash(hash)
+	defer func() {
+		_ = file.Close()
+	}()
 
-	// * Initialize the hash
-	hash = sha256.New()
+	// * Initialize hash
+	hash := sha256.New()
 	buffer := make([]byte, 1024)
 	for {
 		n, err := file.Read(buffer)
@@ -115,10 +97,11 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 		}
 	}
 
-	// * Check the hash
+	// * Compare content hash and xattr hash
 	if !bytes.Equal(hash.Sum(nil), sum) {
-		flag[0] |= 0b00001000
-		_ = xattr.Set(fpath, "user.sh.flag", flag)
+		if er := r.Fileflag.CorruptedSet(path, true); er != nil {
+			return er
+		}
 		return gut.Err(false, "invalid file hash")
 	}
 
