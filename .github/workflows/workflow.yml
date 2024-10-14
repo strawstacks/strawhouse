@@ -11,19 +11,19 @@ jobs:
     steps:
       # Step 1: Checkout original strawhouse repo
       - name: Checkout strawhouse repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensures fetching the tag information
 
       # Step 2: Set up Go environment
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.23'
 
       # Step 3: Setup Docker
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       # Step 3: Install dependencies
       - name: Install protoc
@@ -66,7 +66,7 @@ jobs:
           docker push ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }}
 
       # Step 7: Build binary
-      - name: Build binary get release id and push
+      - name: Build binary
         run: |
           make protoc
           make release
