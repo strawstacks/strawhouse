@@ -11,7 +11,7 @@ func (r *Filepath) RelPath(absolutePath string) string {
 	if err != nil {
 		return ""
 	}
-	return rel
+	return "/" + rel
 }
 
 func (r *Filepath) CombinePath(basePath string, relativePath string) string {

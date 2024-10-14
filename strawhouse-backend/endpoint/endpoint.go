@@ -23,6 +23,9 @@ func Bind(app *fiber.App, systemHandler *system.Handler, getHandler *get.Handler
 
 	// * Get route
 	app.Get("/", HandleRoot)
+	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
+		return c.Redirect("https://static1.pixcee.dev/external/strawstacks/favicon.ico", fiber.StatusMovedPermanently)
+	})
 	app.Get("*", getHandler.Get)
 	app.Use(HandleNotFound)
 }

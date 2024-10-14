@@ -10,12 +10,12 @@ type ExampleAttribute struct {
 	SessionName *string
 }
 
-func (r *Signature) extractPathSlice(path string, depth uint32) []byte {
+func (r *Signature) extractPathSlice(path string, depth uint8) []byte {
 	count := int(depth)
 	for index := 0; index < len(path); index++ {
 		if path[index] == '/' {
 			count--
-			if count < 0 {
+			if count == 0 {
 				return unsafe.Slice(unsafe.StringData(path), index+1)
 			}
 		}
@@ -24,14 +24,17 @@ func (r *Signature) extractPathSlice(path string, depth uint32) []byte {
 	return unsafe.Slice(unsafe.StringData(path), len(path))
 }
 
-func (r *Signature) extractDirSlice(path string) []byte {
-	for index := len(path) - 1; index >= 0; index-- {
-		if path[index] == '/' {
-			return unsafe.Slice(unsafe.StringData(path), index+1)
+func (r *Signature) CountFixedDepth(path string) uint8 {
+	depth := uint8(0)
+	for i := 0; i < len(path); i++ {
+		if path[i] == '/' {
+			depth++
+			if depth == 0b111 {
+				break
+			}
 		}
 	}
-
-	return nil
+	return depth
 }
 
 func (r *Signature) ReplaceClean(str *string) {

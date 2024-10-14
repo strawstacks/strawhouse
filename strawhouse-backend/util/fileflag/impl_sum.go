@@ -25,7 +25,12 @@ func (r *Fileflag) SumSet(relativePath string, sum []byte) *gut.ErrorInstance {
 	return nil
 }
 
-func (r *Fileflag) SumGet(relativePath string) ([]byte, *gut.ErrorInstance) {
+func (r *Fileflag) SumGet(relativePath string) (r1 []byte, er *gut.ErrorInstance) {
+	defer func() {
+		if er != nil {
+			_ = r.CorruptedSet(relativePath, true)
+		}
+	}()
 	// * Convert path
 	absolutePath := r.filepath.AbsPath(relativePath)
 

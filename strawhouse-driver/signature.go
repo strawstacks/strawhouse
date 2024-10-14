@@ -9,8 +9,8 @@ import (
 )
 
 type Signaturer interface {
-	Generate(version uint8, mode SignatureMode, action SignatureAction, depth uint32, expired time.Time, path string, attribute []byte) (token string)
-	Verify(act SignatureAction, path string, attribute []byte, token string) (err error)
+	Generate(action SignatureAction, mode SignatureMode, path string, nesting bool, expired time.Time, attribute string) string
+	Verify(act SignatureAction, path string, token string) (attribute string, err error)
 }
 
 type Signature struct {

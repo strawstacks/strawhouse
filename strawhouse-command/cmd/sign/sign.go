@@ -15,6 +15,16 @@ var Cmd = &cobra.Command{
 	Short: "Generate signed token",
 	Run: func(cmd *cobra.Command, args []string) {
 		common.InitDriver()
+		// * Parse action
+		actionFlag, _ := cmd.Flags().GetString("action")
+		var action strawhouse.SignatureAction
+		if actionFlag == "get" {
+			action = strawhouse.SignatureActionGet
+		} else if actionFlag == "upload" {
+			action = strawhouse.SignatureActionUpload
+		} else {
+			log.Fatalf("action must be one of 'get' or 'upload'")
+		}
 
 		// * Parse mode
 		modeFlag, _ := cmd.Flags().GetString("mode")
@@ -27,22 +37,8 @@ var Cmd = &cobra.Command{
 			log.Fatalf("mode must be one of 'file' or 'dir'")
 		}
 
-		// * Parse action
-		actionFlag, _ := cmd.Flags().GetString("action")
-		var action strawhouse.SignatureAction
-		if actionFlag == "get" {
-			action = strawhouse.SignatureActionGet
-		} else if actionFlag == "upload" {
-			action = strawhouse.SignatureActionUpload
-		} else {
-			log.Fatalf("action must be one of 'get' or 'upload'")
-		}
-
 		// * Parse depth
-		depth, _ := cmd.Flags().GetInt("depth")
-		if depth < 0 {
-			log.Fatalf("depth must be a positive integer")
-		}
+		recursive, _ := cmd.Flags().GetBool("recursive")
 
 		// * Expired seconds
 		expired, _ := cmd.Flags().GetInt("expired")
@@ -58,26 +54,26 @@ var Cmd = &cobra.Command{
 		if !strings.HasPrefix(path, "/") {
 			path = "/" + path
 		}
-		if !strings.HasSuffix(path, "/") {
+		if mode == strawhouse.SignatureModeDirectory && !strings.HasSuffix(path, "/") {
 			path += "/"
 		}
 
 		// * Generate signed token
-		token := common.Driver.Signature.Generate(1, mode, action, uint32(depth), time.Now().Add(time.Duration(expired)*time.Second), path, nil)
+		token := common.Driver.Signature.Generate(action, mode, path, recursive, time.Now().Add(time.Duration(expired)*time.Second), "")
 		fmt.Println(token)
 	},
 }
 
 func init() {
-	Cmd.Flags().String("mode", "", "Entity mode. One of 'file' or 'dir'")
 	Cmd.Flags().String("action", "", "Action to perform. One of 'get' or 'upload'")
-	Cmd.Flags().Int("depth", 0, "Depth of directory")
+	Cmd.Flags().String("mode", "", "Entity mode. One of 'file' or 'dir'")
+	Cmd.Flags().Bool("recursive", false, "Allow recursive access")
 	Cmd.Flags().Int("expired", 0, "Expired seconds")
 	Cmd.Flags().String("path", "", "Path to sign")
 
-	_ = Cmd.MarkFlagRequired("mode")
 	_ = Cmd.MarkFlagRequired("action")
-	_ = Cmd.MarkFlagRequired("depth")
+	_ = Cmd.MarkFlagRequired("mode")
+	_ = Cmd.MarkFlagRequired("recursive")
 	_ = Cmd.MarkFlagRequired("expired")
 	_ = Cmd.MarkFlagRequired("path")
 }

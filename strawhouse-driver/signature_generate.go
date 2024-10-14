@@ -9,36 +9,51 @@ import (
 	"unsafe"
 )
 
-func (r *Signature) Generate(version uint8, mode SignatureMode, action SignatureAction, depth uint32, expired time.Time, path string, attribute []byte) string {
+func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path string, nesting bool, expired time.Time, attribute string) string {
+	// * Spell check path
+	if path[0] != '/' {
+		gut.Fatal("Path must start with /", nil)
+	}
+	if mode == SignatureModeDirectory && path[len(path)-1] != '/' {
+		gut.Fatal("Path must end with /", nil)
+	}
+
 	// * Construct data
-	data := make([]byte, 27)
+	data := make([]byte, 30)
 
 	// * Add version 1 byte
-	data[0] = version
+	data[0] = uint8(1)
 
-	// * Add metadata 1 byte
-	var pathSlice []byte
-	if mode == SignatureModeFile {
+	// * Add action 1 bit
+	if action == SignatureActionGet {
 		data[1] &= 0b01111111
-		pathSlice = []byte(path)
-	} else if mode == SignatureModeDirectory {
+	} else if action == SignatureActionUpload {
 		data[1] |= 0b10000000
-		pathSlice = r.extractPathSlice(path, depth)
+	} else {
+		gut.Fatal("Invalid action: "+strconv.Itoa(int(action)), nil)
+	}
 
-		// * Add depth 6 bits
-		if depth > 63 {
-			depth = 63
-		}
-		data[1] |= byte(depth)
+	// * Add metadata 1 bit
+	if mode == SignatureModeFile {
+		data[1] &= 0b10111111
+	} else if mode == SignatureModeDirectory {
+		data[1] |= 0b01000000
 	} else {
 		gut.Fatal("Invalid mode: "+strconv.Itoa(int(mode)), nil)
 	}
-	if action == SignatureActionGet {
-		data[1] &= 0b10111111
-	} else if action == SignatureActionUpload {
-		data[1] |= 0b01000000
+
+	// * Add fixed depth 5 bits
+	depth := r.CountFixedDepth(path)
+	if depth > 0b11111 {
+		depth = 0b11111
+	}
+	data[1] |= depth << 1
+
+	// * Add nesting 1 bit
+	if nesting {
+		data[1] |= 0b00000001
 	} else {
-		gut.Fatal("Invalid action: "+strconv.Itoa(int(action)), nil)
+		data[1] &= 0b11111110
 	}
 
 	// * Add expired time 5 bytes
@@ -46,8 +61,6 @@ func (r *Signature) Generate(version uint8, mode SignatureMode, action Signature
 	if offset > 0xFFFFFFFFFF {
 		offset = 0xFFFFFFFFFF
 	}
-
-	// * Add 5 bytes offset
 	data[2] = byte(offset >> 32)
 	data[3] = byte(offset >> 24)
 	data[4] = byte(offset >> 16)
@@ -56,19 +69,20 @@ func (r *Signature) Generate(version uint8, mode SignatureMode, action Signature
 
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 18}
+	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 7}
 	hash := r.GetHash()
 	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
-	hash.Write(pathSlice)
-	hash.Write(attribute)
+	hash.Write([]byte(path))
+	hash.Write([]byte(attribute))
 	signature := hash.Sum(nil)
 	r.PutHash(hash)
-	copy(data[7:], signature[:20])
+	copy(data[7:], signature[:23])
 
-	// * Convert data to base64
-	base64buffer := make([]byte, 36)
-	base64.StdEncoding.Encode(base64buffer, data)
-	encoded := string(base64buffer[:])
+	// * Encode data
+	headBuffer := make([]byte, 40)
+	base64.StdEncoding.Encode(headBuffer, data)
+	encoded := string(headBuffer[:])
 	r.ReplaceClean(&encoded)
-	return encoded
+
+	return encoded + attribute
 }

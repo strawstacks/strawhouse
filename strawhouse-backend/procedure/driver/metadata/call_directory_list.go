@@ -21,13 +21,13 @@ func (r *Server) DirectoryList(ctx context.Context, req *pb.DirectoryListRequest
 			if path != dir {
 				directories = append(directories, &pb.Directory{
 					Name: info.Name(),
-					Path: path,
+					Path: r.Filepath.RelPath(path) + "/",
 				})
 			}
 		} else {
 			files = append(files, &pb.File{
 				Name:      info.Name(),
-				Directory: filepath.Dir(path),
+				Directory: r.Filepath.RelPath(filepath.Dir(path)) + "/",
 				Checksum:  "",
 				Size:      info.Size(),
 				Mtime:     info.ModTime().Unix(),

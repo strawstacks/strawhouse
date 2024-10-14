@@ -10,11 +10,12 @@ import (
 
 func Init(lc fx.Lifecycle, config *config.Config) *fiber.App {
 	app := fiber.New(fiber.Config{
-		ErrorHandler:      ErrorHandler,
-		Prefork:           false,
-		StrictRouting:     true,
-		StreamRequestBody: true,
-		Network:           *config.WebListen[0],
+		ErrorHandler:                 ErrorHandler,
+		Prefork:                      false,
+		StrictRouting:                true,
+		StreamRequestBody:            true,
+		DisablePreParseMultipartForm: true,
+		Network:                      *config.WebListen[0],
 	})
 
 	lc.Append(fx.Hook{

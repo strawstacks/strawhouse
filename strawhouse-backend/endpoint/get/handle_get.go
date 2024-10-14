@@ -3,7 +3,6 @@ package get
 import (
 	"bytes"
 	"crypto/sha256"
-	"encoding/base64"
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
 	"github.com/strawstacks/strawhouse/strawhouse-driver"
@@ -22,27 +21,25 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	if err != nil {
 		return gut.Err(false, "unable to decode path", err)
 	}
-	fpath := filepath.Join(*r.Config.DataRoot, path)
 	token := c.Query("t")
-	attr := c.Query("a")
 
-	// * Decode attributes
-	r.Signature.ReplaceClean(&attr)
-	attrBytes, err := base64.StdEncoding.DecodeString(attr)
+	// * Construct absolute path
+	absolutePath := r.Filepath.AbsPath(path)
 
 	// * Verify the file
-	if er := r.Signature.VerifyInt(strawhouse.SignatureActionGet, path, attrBytes, token); er != nil {
+	// TODO: Implement attribute usage from token
+	if _, er := r.Signature.VerifyInt(strawhouse.SignatureActionGet, path, token); er != nil {
 		return er
 	}
 
 	// * Check if path is a directory
-	fileInfo, err := os.Stat(fpath)
+	fileInfo, err := os.Stat(absolutePath)
 	if err != nil || fileInfo.IsDir() {
 		return gut.Err(false, "file not found")
 	}
 
 	// * Detect content type from file extension
-	contentType := mime.TypeByExtension(filepath.Ext(fpath))
+	contentType := mime.TypeByExtension(filepath.Ext(absolutePath))
 	if contentType == "" {
 		contentType = "text/plain"
 	}
@@ -72,7 +69,7 @@ func (r *Handler) Get(c *fiber.Ctx) error {
 	}
 
 	// * Open the file
-	file, err := os.Open(fpath)
+	file, err := os.Open(absolutePath)
 	if err != nil {
 		return gut.Err(false, "unable to open file", err)
 	}
