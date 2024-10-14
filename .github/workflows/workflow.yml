@@ -66,9 +66,10 @@ jobs:
           docker push ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }}
 
       # Step 7: Build binary
-      - name: Build binary
+      - name: Build binary get release id and push
         run: |
           make protoc
           make release
-          curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse-go/releases/${{ github.ref_name }}/assets?name=strawhousebackd_linux_amd64"
-          curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse-go/releases/${{ github.ref_name }}/assets?name=strawhousebackd_linux_arm64"
+          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/v0.1.2" | jq -r '.id')
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_arm64"
