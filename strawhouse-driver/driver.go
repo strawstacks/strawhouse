@@ -5,9 +5,13 @@ type Driver struct {
 	Client    Clienter
 }
 
-func New(key string, server string) *Driver {
+type Option struct {
+	Secure bool
+}
+
+func New(key string, server string, option *Option) *Driver {
 	sgn := NewSignature(key)
-	cnt := NewClient(key, server)
+	cnt := NewClient(key, server, option)
 
 	return &Driver{
 		Signature: sgn,

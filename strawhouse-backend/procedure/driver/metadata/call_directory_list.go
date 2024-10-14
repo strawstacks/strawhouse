@@ -10,8 +10,8 @@ import (
 func (r *Server) DirectoryList(ctx context.Context, req *pb.DirectoryListRequest) (*pb.DirectoryListResponse, error) {
 	dir := filepath.Join(*r.Config.DataRoot, req.Directory)
 
-	var files []*pb.File
-	var directories []*pb.Directory
+	files := make([]*pb.File, 0)
+	directories := make([]*pb.Directory, 0)
 
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {

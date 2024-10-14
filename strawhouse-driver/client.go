@@ -2,9 +2,12 @@ package strawhouse
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse/strawhouse-proto/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 )
@@ -24,10 +27,26 @@ type Client struct {
 	driverFeedClient     pb.DriverFeedClient
 }
 
-func NewClient(key string, server string) *Client {
+func NewClient(key string, server string, option *Option) *Client {
+	// * Construct credentials
+	var cred credentials.TransportCredentials
+	if option.Secure {
+		roots, err := x509.SystemCertPool()
+		if err != nil {
+			gut.Fatal("failed to read system cert pool", err)
+		}
+		cred = credentials.NewTLS(&tls.Config{
+			RootCAs:    roots,
+			NextProtos: []string{"h2"},
+		})
+	} else {
+		cred = insecure.NewCredentials()
+	}
+
+	// * Construct gRPC client
 	gr, err := grpc.NewClient(
 		server,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(cred),
 		grpc.WithUnaryInterceptor(UnaryInterceptor(key)),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(GrpcMaxMessageSize),

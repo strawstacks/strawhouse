@@ -22,8 +22,8 @@ var setCmd = &cobra.Command{
 	Short: "Set a config key and value",
 	Run: func(cmd *cobra.Command, args []string) {
 		name, _ := cmd.Flags().GetString("name")
-		if err := gut.Validator.Var(name, "oneof=server key"); err != nil {
-			log.Fatalf("name is required one of 'server' or 'key'")
+		if err := gut.Validator.Var(name, "oneof=server secure key"); err != nil {
+			log.Fatalf("name is required one of 'server', 'secure', or 'key'")
 		}
 
 		reader := bufio.NewReader(os.Stdin)
@@ -47,7 +47,7 @@ var setCmd = &cobra.Command{
 }
 
 func init() {
-	setCmd.Flags().String("name", "", "Key to set. One of 'server' or 'key'")
+	setCmd.Flags().String("name", "", "Config to set. One of 'server', 'secure', or 'key'")
 	_ = setCmd.MarkFlagRequired("name")
 	Cmd.AddCommand(setCmd)
 }
