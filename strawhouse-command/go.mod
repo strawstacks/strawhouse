@@ -7,13 +7,11 @@ require (
 	github.com/keybase/go-keychain v0.0.0-20231219164618-57a3676c3af6
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
-	github.com/strawstacks/strawhouse/strawhouse-driver v0.0.0-20240926101701-d1f1f100f3bd
 )
 
 require (
-	github.com/bsthun/goutils v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.1 // indirect
