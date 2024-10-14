@@ -4,7 +4,6 @@ bench:
 
 .PHONY: protoc
 protoc:
-	cd ./strawhouse-proto && go mod tidy
 	protoc --go_out=./strawhouse-proto --go-grpc_out=./strawhouse-proto ./strawhouse-proto/**/*.proto
 
 .PHONY: release
