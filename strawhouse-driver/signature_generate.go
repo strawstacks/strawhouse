@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path string, nesting bool, expired time.Time, attribute string) string {
+func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path string, recursive bool, expired time.Time, attribute string) string {
 	// * Spell check path
 	if path[0] != '/' {
 		gut.Fatal("Path must start with /", nil)
@@ -49,8 +49,8 @@ func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path st
 	}
 	data[1] |= depth << 1
 
-	// * Add nesting 1 bit
-	if nesting {
+	// * Add recursive 1 bit
+	if recursive {
 		data[1] |= 0b00000001
 	} else {
 		data[1] &= 0b11111110

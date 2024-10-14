@@ -32,7 +32,7 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 	action := SignatureAction((data[1] & 0b10000000) >> 7)
 	mode := SignatureMode((data[1] & 0b01000000) >> 6)
 	depth := data[1] & 0b00111110 >> 1
-	nesting := data[1] & 0b00000001
+	recursive := data[1] & 0b00000001
 	offset := (uint64(data[2]) << 32) | (uint64(data[3]) << 24) | (uint64(data[4]) << 16) | (uint64(data[5]) << 8) | uint64(data[6])
 	expired := time.Unix(int64(offset), 0)
 
@@ -60,8 +60,8 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 		if r.CountFixedDepth(path) < depth {
 			return "", gut.Err(false, "accessing non permitted depth")
 		}
-		if nesting == 0 && r.CountFixedDepth(path) > depth {
-			return "", gut.Err(false, "non permitted nesting")
+		if recursive == 0 && r.CountFixedDepth(path) > depth {
+			return "", gut.Err(false, "non permitted recursive")
 		}
 	} else {
 		gut.Fatal("invalid mode", nil)

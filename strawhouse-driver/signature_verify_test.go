@@ -41,7 +41,7 @@ func TestVerify(t *testing.T) {
 	assert.Equal(t, err, gut.Err(false, "accessing non permitted depth"))
 
 	attribute, err = signature.VerifyInt(SignatureActionUpload, "/photo/2024/0628-sao-kmutt-seminar/img/2.png", token)
-	assert.Equal(t, err, gut.Err(false, "non permitted nesting"))
+	assert.Equal(t, err, gut.Err(false, "non permitted recursive"))
 
 	attribute, err = signature.VerifyInt(SignatureActionGet, "/photo/2024/hello2.jpg", token)
 	assert.Equal(t, err, gut.Err(false, "invalid action"))

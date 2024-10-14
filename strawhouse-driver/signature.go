@@ -9,7 +9,7 @@ import (
 )
 
 type Signaturer interface {
-	Generate(action SignatureAction, mode SignatureMode, path string, nesting bool, expired time.Time, attribute string) string
+	Generate(action SignatureAction, mode SignatureMode, path string, recursive bool, expired time.Time, attribute string) string
 	Verify(act SignatureAction, path string, token string) (attribute string, err error)
 }
 
