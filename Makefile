@@ -1,10 +1,10 @@
-.PHONY: protoc
-protoc:
-	protoc --go_out=./strawhouse-proto --go-grpc_out=./strawhouse-proto ./strawhouse-proto/**/*.proto
-
 .PHONY: bench
 bench:
 	go test -v -benchmem -bench . ./strawhouse-driver/...
+
+.PHONY: protoc
+protoc:
+	protoc --go_out=./strawhouse-proto --go-grpc_out=./strawhouse-proto ./strawhouse-proto/**/*.proto
 
 .PHONY: release
 release:

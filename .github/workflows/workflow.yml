@@ -69,6 +69,7 @@ jobs:
       # Step 7: Build binary
       - name: Build binary
         run: |
+          make protoc
           make release
           curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse-go/releases/${{ github.ref_name }}/assets?name=strawhousebackd_linux_amd64"
           curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse-go/releases/${{ github.ref_name }}/assets?name=strawhousebackd_linux_arm64"
