@@ -64,7 +64,7 @@ jobs:
           docker login --username bsthun --password ${{ secrets.PAT_TOKEN }} ghcr.io
           docker build -t ghcr.io/strawstacks/strawhouse/backend:latest .
           docker build -t ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }} .
-          docker push ghcr.io/strawstacks/strawhouse/backend:latest .
+          docker push ghcr.io/strawstacks/strawhouse/backend:latest
           docker push ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }}
 
       # Step 7: Build binary
