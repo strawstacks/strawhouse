@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func (r *Service) Upload(token string, name string, directory string, file io.ReadCloser) (*string, *string, []byte, *string, *gut.ErrorInstance) {
+func (r *Service) Upload(token string, name string, directory string, file io.ReadCloser) (*string, []byte, []byte, *string, *gut.ErrorInstance) {
 	// * Normalize file name
 	name = r.filepath.BaseName(name)
 	if len(name) < 3 {
@@ -84,5 +84,5 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 	encoded = encoded[:len(encoded)-1]
 	r.signature.ReplaceClean(&encoded)
 
-	return &relativeFilePath, &attribute, sum, &encoded, nil
+	return &relativeFilePath, attribute, sum, &encoded, nil
 }

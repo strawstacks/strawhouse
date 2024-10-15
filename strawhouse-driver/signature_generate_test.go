@@ -15,6 +15,6 @@ func Prepare() (*Signature, string) {
 func BenchmarkGenerate(b *testing.B) {
 	signature, attr := Prepare()
 	for n := 0; n < b.N; n++ {
-		signature.Generate(SignatureActionGet, SignatureModeDirectory, "/photo/2024/", true, time.Now().Add(20*time.Minute), attr)
+		signature.Generate(SignatureActionGet, SignatureModeDirectory, "/photo/2024/", true, time.Now().Add(20*time.Minute), []byte(attr))
 	}
 }

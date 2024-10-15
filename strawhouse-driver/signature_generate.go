@@ -9,7 +9,7 @@ import (
 	"unsafe"
 )
 
-func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path string, recursive bool, expired time.Time, attribute string) string {
+func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path string, recursive bool, expired time.Time, attribute []byte) string {
 	// * Spell check path
 	if path[0] != '/' {
 		gut.Fatal("Path must start with /", nil)
@@ -73,16 +73,23 @@ func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path st
 	hash := r.GetHash()
 	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	hash.Write([]byte(path))
-	hash.Write([]byte(attribute))
+	hash.Write(attribute)
 	signature := hash.Sum(nil)
 	r.PutHash(hash)
 	copy(data[7:], signature[:23])
 
 	// * Encode data
-	headBuffer := make([]byte, 40)
-	base64.StdEncoding.Encode(headBuffer, data)
-	encoded := string(headBuffer[:])
+	attributeLength := base64.StdEncoding.EncodedLen(len(attribute))
+	buffer := make([]byte, 40+attributeLength)
+	base64.StdEncoding.Encode(buffer, data)
+
+	attributeBuffer := make([]byte, attributeLength)
+	base64.StdEncoding.Encode(attributeBuffer, attribute)
+
+	// * Merge data and attribute
+	copy(buffer[40:], attributeBuffer[:])
+	encoded := string(buffer[:])
 	r.ReplaceClean(&encoded)
 
-	return encoded + attribute
+	return encoded
 }

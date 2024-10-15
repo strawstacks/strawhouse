@@ -58,7 +58,7 @@ func (r *Handler) Upload(c *fiber.Ctx) error {
 		Name:      fileHeader.Filename,
 		Directory: directory,
 		Hash:      *encoded,
-		Attr:      *attribute,
+		Attr:      attribute,
 	})
 
 	return c.JSON(response.Success(&payload.UploadResponse{

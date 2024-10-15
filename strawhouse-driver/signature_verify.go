@@ -9,14 +9,14 @@ import (
 	"unsafe"
 )
 
-func (r *Signature) Verify(act SignatureAction, path string, token string) (string, error) {
+func (r *Signature) Verify(act SignatureAction, path string, token string) ([]byte, error) {
 	return r.VerifyInt(act, path, token)
 }
 
-func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (string, *gut.ErrorInstance) {
+func (r *Signature) VerifyInt(act SignatureAction, path string, token string) ([]byte, *gut.ErrorInstance) {
 	// * Reconstruct data
 	if len(token) < 40 {
-		return "", gut.Err(false, "token too short")
+		return nil, gut.Err(false, "token too short")
 	}
 	r.ReplaceUnclean(&token)
 
@@ -24,8 +24,16 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 	data := make([]byte, 30)
 	ln, err := base64.StdEncoding.Decode(data, []byte(token)[:40])
 	if err != nil || ln != 30 {
-		return "", gut.Err(false, "malformed token", err)
+		return nil, gut.Err(false, "malformed token", err)
 	}
+
+	// * Decode attribute
+	attribute := make([]byte, base64.StdEncoding.DecodedLen(len(token)-40))
+	ln, err = base64.StdEncoding.Decode(attribute, []byte(token)[40:])
+	if err != nil {
+		return nil, gut.Err(false, "malformed attribute", err)
+	}
+	attribute = attribute[:ln]
 
 	// Extract data
 	version := data[0]
@@ -38,17 +46,17 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 
 	// * Check version
 	if version != 1 {
-		return "", gut.Err(false, "token version not supported")
+		return nil, gut.Err(false, "token version not supported")
 	}
 
 	// * Check action
 	if act != action {
-		return "", gut.Err(false, "invalid action")
+		return nil, gut.Err(false, "invalid action")
 	}
 
 	// * Check expired
 	if time.Now().After(expired) {
-		return "", gut.Err(false, "token expired")
+		return nil, gut.Err(false, "token expired")
 	}
 
 	// * Reconstruct path
@@ -58,17 +66,14 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 	} else if mode == SignatureModeDirectory {
 		pathValue = r.extractPathSlice(path, depth)
 		if r.CountFixedDepth(path) < depth {
-			return "", gut.Err(false, "accessing non permitted depth")
+			return nil, gut.Err(false, "accessing non permitted depth")
 		}
 		if recursive == 0 && r.CountFixedDepth(path) > depth {
-			return "", gut.Err(false, "non permitted recursive")
+			return nil, gut.Err(false, "non permitted recursive")
 		}
 	} else {
 		gut.Fatal("invalid mode", nil)
 	}
-
-	// * Reconstruct attribute
-	attribute := []byte(token[40:])
 
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
@@ -82,8 +87,8 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) (s
 
 	// * Compare token
 	if !bytes.Equal(data[7:], signature[:23]) {
-		return "", gut.Err(false, "invalid token")
+		return nil, gut.Err(false, "invalid token")
 	}
 
-	return token[40:], nil
+	return attribute, nil
 }

@@ -1,6 +1,7 @@
 package strawhouse
 
 import (
+	"github.com/bsthun/gut"
 	"reflect"
 	"unsafe"
 )
@@ -35,6 +36,42 @@ func (r *Signature) CountFixedDepth(path string) uint8 {
 		}
 	}
 	return depth
+}
+
+func (r *Signature) UrlSafe(str *string) error {
+	// From https://stackoverflow.com/a/40415059: A-Z a-z 0-9 - . _ ~ ( ) ' ! * : @ , ;
+	byteSlice := (*[]byte)(unsafe.Pointer(&reflect.StringHeader{
+		Data: (*reflect.StringHeader)(unsafe.Pointer(str)).Data,
+		Len:  len(*str),
+	}))
+	for i := 0; i < len(*byteSlice); i++ {
+		if (*byteSlice)[i] > 'A' && (*byteSlice)[i] < 'Z' {
+			return nil
+		}
+		if (*byteSlice)[i] > 'a' && (*byteSlice)[i] < 'z' {
+			return nil
+		}
+		if (*byteSlice)[i] > '0' && (*byteSlice)[i] < '9' {
+			return nil
+		}
+		if (*byteSlice)[i] == '-' ||
+			(*byteSlice)[i] == '.' ||
+			(*byteSlice)[i] == '_' ||
+			(*byteSlice)[i] == '~' ||
+			(*byteSlice)[i] == '(' ||
+			(*byteSlice)[i] == ')' ||
+			(*byteSlice)[i] == '\'' ||
+			(*byteSlice)[i] == '!' ||
+			(*byteSlice)[i] == '*' ||
+			(*byteSlice)[i] == ':' ||
+			(*byteSlice)[i] == '@' ||
+			(*byteSlice)[i] == ',' ||
+			(*byteSlice)[i] == ';' {
+			return nil
+		}
+	}
+
+	return gut.Err(false, "invalid character")
 }
 
 func (r *Signature) ReplaceClean(str *string) {

@@ -59,7 +59,7 @@ var Cmd = &cobra.Command{
 		}
 
 		// * Generate signed token
-		token := common.Driver.Signature.Generate(action, mode, path, recursive, time.Now().Add(time.Duration(expired)*time.Second), "")
+		token := common.Driver.Signature.Generate(action, mode, path, recursive, time.Now().Add(time.Duration(expired)*time.Second), nil)
 		fmt.Println(token)
 	},
 }
