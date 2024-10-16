@@ -7,10 +7,11 @@ on:
 
 jobs:
   build:
+    name: Sync strawhouse-backend
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout original strawhouse repo
-      - name: Checkout strawhouse repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Ensures fetching the tag information
@@ -65,7 +66,7 @@ jobs:
           BUILDX_NO_DEFAULT_ATTESTATIONS=1 \
             docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            --tag ghcr.io/strawstacks/strawhouse-backend:v0.1.2 \
+            --tag ghcr.io/strawstacks/strawhouse-backend:${{ github.ref_name }} \
             --tag ghcr.io/strawstacks/strawhouse-backend:latest \
             --push .
 
@@ -74,6 +75,35 @@ jobs:
         run: |
           make protoc
           make release
-          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/v0.1.2" | jq -r '.id')
+          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_arm64"
+
+  build-command:
+    name: Build strawhouse-command
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build strawhouse-command
+        run: |
+          brew update > /dev/null
+          brew install protobuf > /dev/null
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          make protoc
+          mkdir -p ./.local/release
+          GOARCH=${{ matrix.arch }} GOOS=darwin go build -o ./.local/release/strawc_darwin_${{ matrix.arch }} ./strawhouse-command/
+          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_${{ matrix.arch }}" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_${{ matrix.arch }}"
