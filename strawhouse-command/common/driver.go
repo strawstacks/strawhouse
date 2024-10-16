@@ -1,30 +1,33 @@
 package common
 
 import (
+	"github.com/bsthun/gut"
 	"github.com/spf13/viper"
 	"github.com/strawstacks/strawhouse/strawhouse-driver"
-	"log"
+	"github.com/zalando/go-keyring"
 )
 
 var Driver *strawhouse.Driver
 
 func InitDriver() {
-	key := ConfigVaultKeyGet()
+	key, err := keyring.Get(KeyringService, KeyringUser)
+	if err != nil {
+		gut.Fatal("failed to get key from keyring", err)
+	}
 	server := viper.Get("server")
 	secure := viper.Get("secure")
 	if server == nil {
-		log.Fatalf("server is required, please use 'strawc config set --name server'")
+		gut.Fatal("server is required, please use 'strawc config set --name server'", nil)
 	}
 	if secure == nil {
-		log.Fatalf("secure is required, please use 'strawc config set --name secure' with value of <y/n>'")
+		gut.Fatal("secure is required, please use 'strawc config set --name secure' with value of <y/n>'", nil)
 	}
-	var err error
 	Driver, err = strawhouse.New(&strawhouse.Option{
 		Key:    key,
 		Server: server.(string),
 		Secure: secure.(string) == "y",
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize driver: %v", err)
+		gut.Fatal("failed to initialize driver", err)
 	}
 }

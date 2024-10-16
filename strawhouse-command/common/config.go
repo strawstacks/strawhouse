@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 )
 
-const ConfigIdentifier = "dev.pixcee.strawhouse.command"
+const KeyringService = "dev.pixcee.strawhouse.command"
+const KeyringUser = "strawhouse-command"
 
 func InitConfig() {
 	path := filepath.Join(os.Getenv("HOME"), ".config", "strawhouse")

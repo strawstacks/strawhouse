@@ -78,32 +78,9 @@ jobs:
           RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_arm64"
-
-  build-command:
-    name: Build strawhouse-command
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        arch: [ amd64, arm64 ]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-
-      - name: Build strawhouse-command
-        run: |
-          brew update > /dev/null
-          brew install protobuf > /dev/null
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-          make protoc
-          mkdir -p ./.local/release
-          GOARCH=${{ matrix.arch }} GOOS=darwin go build -o ./.local/release/strawc_darwin_${{ matrix.arch }} ./strawhouse-command/
-          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_${{ matrix.arch }}" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_${{ matrix.arch }}"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_linux_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_linux_arm64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_arm64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_amd64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_amd64.exe"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_arm64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_arm64.exe"

@@ -9,12 +9,11 @@ protoc:
 .PHONY: release
 release:
 	mkdir -p ./.local/release/
-	@env GOOS=linux GOARCH=amd64 go build -o ./.local/release/strawhousebackd_linux_amd64 ./strawhouse-backend/
-	@env GOOS=linux GOARCH=arm64 go build -o ./.local/release/strawhousebackd_linux_arm64 ./strawhouse-backend/
-	@if [ "$(shell uname -s)" = "Darwin" ]; then \
-	  if [ "$(shell uname -m)" = "x86_64" ]; then \
-		env GOOS=darwin GOARCH=amd64 go build -o ./.local/release/strawc_darwin_amd64 ./strawhouse-command/; \
-	  elif [ "$(shell uname -m)" = "arm64" ]; then \
-		env GOOS=darwin GOARCH=arm64 go build -o ./.local/release/strawc_darwin_arm64 ./strawhouse-command/; \
-	  fi; \
-	fi
+	env GOOS=linux GOARCH=amd64 go build -o ./.local/release/strawhousebackd_linux_amd64 ./strawhouse-backend/
+	env GOOS=linux GOARCH=arm64 go build -o ./.local/release/strawhousebackd_linux_arm64 ./strawhouse-backend/
+	env GOOS=linux GOARCH=amd64 go build -o ./.local/release/strawc_linux_amd64 ./strawhouse-command/
+	env GOOS=linux GOARCH=arm64 go build -o ./.local/release/strawc_linux_arm64 ./strawhouse-command/
+	env GOOS=darwin GOARCH=amd64 go build -o ./.local/release/strawc_darwin_amd64 ./strawhouse-command/
+	env GOOS=darwin GOARCH=arm64 go build -o ./.local/release/strawc_darwin_arm64 ./strawhouse-command/
+	env GOOS=windows GOARCH=amd64 go build -o ./.local/release/strawc_windows_amd64.exe ./strawhouse-command/
+	env GOOS=windows GOARCH=arm64 go build -o ./.local/release/strawc_windows_arm64.exe ./strawhouse-command/

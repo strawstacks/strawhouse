@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/strawstacks/strawhouse/strawhouse-command/common"
+	"github.com/zalando/go-keyring"
 	"log"
 	"os"
 	"strings"
@@ -36,7 +37,11 @@ var setCmd = &cobra.Command{
 
 		viper.Set(name, value)
 		if name == "key" {
-			common.ConfigVaultKeySave(value)
+			err := keyring.Set(common.KeyringService, common.KeyringUser, value)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println("key set in keyring")
 		} else {
 			if err := viper.WriteConfig(); err != nil {
 				log.Fatalf("unable to write to config file: %v", err)
