@@ -16,7 +16,8 @@ func Init(lc fx.Lifecycle, config *config.Config) *grpc.Server {
 
 	// * Initialize gRPC server
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptor.TokenAuthInterceptor),
+		grpc.UnaryInterceptor(interceptor.AuthorizationUnaryInterceptor),
+		grpc.StreamInterceptor(interceptor.AuthorizationStreamInterceptor),
 		grpc.MaxRecvMsgSize(strawhouse.GrpcMaxMessageSize),
 		grpc.MaxSendMsgSize(strawhouse.GrpcMaxMessageSize),
 	)

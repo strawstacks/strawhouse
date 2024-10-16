@@ -18,7 +18,13 @@ func InitDriver() {
 	if secure == nil {
 		log.Fatalf("secure is required, please use 'strawc config set --name secure' with value of <y/n>'")
 	}
-	Driver = strawhouse.New(key, server.(string), &strawhouse.Option{
+	var err error
+	Driver, err = strawhouse.New(&strawhouse.Option{
+		Key:    key,
+		Server: server.(string),
 		Secure: secure.(string) == "y",
 	})
+	if err != nil {
+		log.Fatalf("failed to initialize driver: %v", err)
+	}
 }

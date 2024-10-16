@@ -27,7 +27,7 @@ type Client struct {
 	driverFeedClient     pb.DriverFeedClient
 }
 
-func NewClient(key string, server string, option *Option) *Client {
+func NewClient(option *Option) *Client {
 	// * Construct credentials
 	var cred credentials.TransportCredentials
 	if option.Secure {
@@ -45,9 +45,10 @@ func NewClient(key string, server string, option *Option) *Client {
 
 	// * Construct gRPC client
 	gr, err := grpc.NewClient(
-		server,
+		option.Server,
 		grpc.WithTransportCredentials(cred),
-		grpc.WithUnaryInterceptor(UnaryInterceptor(key)),
+		grpc.WithUnaryInterceptor(UnaryInterceptor(option.Key)),
+		grpc.WithStreamInterceptor(StreamInterceptor(option.Key)),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(GrpcMaxMessageSize),
 			grpc.MaxCallSendMsgSize(GrpcMaxMessageSize),
@@ -82,6 +83,21 @@ func UnaryInterceptor(key string) grpc.UnaryClientInterceptor {
 		md := metadata.New(map[string]string{"authorization": key})
 		ctx = metadata.NewOutgoingContext(ctx, md)
 		return invoke(ctx, method, req, reply, cc, opts...)
+	}
+}
+
+func StreamInterceptor(key string) grpc.StreamClientInterceptor {
+	return func(
+		ctx context.Context,
+		desc *grpc.StreamDesc,
+		cc *grpc.ClientConn,
+		method string,
+		streamer grpc.Streamer,
+		opts ...grpc.CallOption,
+	) (grpc.ClientStream, error) {
+		md := metadata.New(map[string]string{"authorization": key})
+		ctx = metadata.NewOutgoingContext(ctx, md)
+		return streamer(ctx, desc, cc, method, opts...)
 	}
 }
 

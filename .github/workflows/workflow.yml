@@ -62,10 +62,12 @@ jobs:
       - name: Build docker
         run: |
           docker login --username bsthun --password ${{ secrets.PAT_TOKEN }} ghcr.io
-          docker build -t ghcr.io/strawstacks/strawhouse/backend:latest .
-          docker build -t ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }} .
-          docker push ghcr.io/strawstacks/strawhouse/backend:latest
-          docker push ghcr.io/strawstacks/strawhouse/backend:${{ github.ref_name }}
+          BUILDX_NO_DEFAULT_ATTESTATIONS=1 \
+            docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --tag ghcr.io/strawstacks/strawhouse-backend:v0.1.2 \
+            --tag ghcr.io/strawstacks/strawhouse-backend:latest \
+            --push .
 
       # Step 7: Build binary
       - name: Build binary
