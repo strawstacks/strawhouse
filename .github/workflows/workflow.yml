@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Sync strawhouse-backend
+    name: Sync strawhouse
     runs-on: ubuntu-latest
     steps:
       # Step 1: Checkout original strawhouse repo
@@ -46,31 +46,16 @@ jobs:
           protoc --go_out=./strawhouse-go --go-grpc_out=./strawhouse-go ./strawhouse-proto/**/*.proto
           sed -i 's|strawhouse/strawhouse-driver|strawhouse-go|g' strawhouse-go/go.mod
           sed -i 's|strawhouse/strawhouse-proto|strawhouse-go|g' strawhouse-go/*.go
-
-      # Step 5: Push changes to strawhouse-go
-      - name: Push changes to strawhouse-go
-        run: |
           cd strawhouse-go
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Sync driver on strawhouse tag ${{ github.ref_name }}"
+          git commit -m "Sync driver on strawhouse tag ${{ github.ref_name }}" || exit 0
           git tag -a ${{ github.ref_name }} -m "Sync driver on strawhouse tag ${{ github.ref_name }}"
           git push https://bsthun:${{ secrets.PAT_TOKEN }}@github.com/strawstacks/strawhouse-go.git main
           curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -d '{"tag_name": "${{ github.ref_name }}", "name": "${{ github.ref_name }}", "body": "Sync driver on strawhouse tag ${{ github.ref_name }}"}' https://api.github.com/repos/strawstacks/strawhouse-go/releases
 
-      # Step 6: Build docker
-      - name: Build docker
-        run: |
-          docker login --username bsthun --password ${{ secrets.PAT_TOKEN }} ghcr.io
-          BUILDX_NO_DEFAULT_ATTESTATIONS=1 \
-            docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --tag ghcr.io/strawstacks/strawhouse-backend:${{ github.ref_name }} \
-            --tag ghcr.io/strawstacks/strawhouse-backend:latest \
-            --push .
-
-      # Step 7: Build binary
+      # Step 5: Build binary
       - name: Build binary
         run: |
           make protoc
@@ -84,3 +69,14 @@ jobs:
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_arm64"
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_amd64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_amd64.exe"
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_arm64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_arm64.exe"
+
+      # Step 6: Build docker
+      - name: Build docker
+        run: |
+          docker login --username bsthun --password ${{ secrets.PAT_TOKEN }} ghcr.io
+          BUILDX_NO_DEFAULT_ATTESTATIONS=1 \
+            docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --tag ghcr.io/strawstacks/strawhouse-backend:${{ github.ref_name }} \
+            --tag ghcr.io/strawstacks/strawhouse-backend:latest \
+            --push .
