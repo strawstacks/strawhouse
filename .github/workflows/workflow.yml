@@ -26,7 +26,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Install dependencies
+      # Step 4: Install dependencies
       - name: Install protoc
         run: |
           sudo apt-get update > /dev/null
@@ -35,7 +35,7 @@ jobs:
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           export PATH="$PATH:$(go env GOPATH)/bin"
 
-      # Step 4: Sync driver to strawhouse-go
+      # Step 5: Sync driver to strawhouse-go
       - name: Sync driver to strawhouse-go
         run: |
           rm -r .git
@@ -55,7 +55,7 @@ jobs:
           git push https://bsthun:${{ secrets.PAT_TOKEN }}@github.com/strawstacks/strawhouse-go.git main
           curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -d '{"tag_name": "${{ github.ref_name }}", "name": "${{ github.ref_name }}", "body": "Sync driver on strawhouse tag ${{ github.ref_name }}"}' https://api.github.com/repos/strawstacks/strawhouse-go/releases
 
-      # Step 5: Build binary
+      # Step 6: Build binary
       - name: Build binary
         run: |
           make protoc
@@ -70,7 +70,7 @@ jobs:
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_amd64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_amd64.exe"
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_arm64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_arm64.exe"
 
-      # Step 6: Build docker
+      # Step 4: Build docker
       - name: Build docker
         run: |
           docker login --username bsthun --password ${{ secrets.PAT_TOKEN }} ghcr.io
