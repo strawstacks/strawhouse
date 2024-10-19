@@ -17,6 +17,7 @@ const GrpcMaxMessageSize = 1024 * 1024 * 1024 * 1024 * 1024 // 1 PB
 type Clienter interface {
 	Close() error
 	DirectoryList(directory string) (*pb.DirectoryListResponse, error)
+	TransferUpload(name string, directory string, content []byte, attribute []byte) error
 	FeedUpload(directory string, callback func(resp *pb.UploadFeedResponse, err error)) (*FeedUploadSession, error)
 }
 

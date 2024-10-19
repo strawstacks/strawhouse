@@ -5,17 +5,16 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse/strawhouse-driver"
 	"io"
 	"os"
 	"path/filepath"
 )
 
-func (r *Service) Upload(token string, name string, directory string, file io.ReadCloser) (*string, []byte, []byte, *string, *gut.ErrorInstance) {
+func (r *Service) Upload(name string, directory string, file io.ReadCloser) (*string, []byte, *string, *gut.ErrorInstance) {
 	// * Normalize file name
 	name = r.filepath.BaseName(name)
 	if len(name) < 3 {
-		return nil, nil, nil, nil, gut.Err(false, "invalid filename", nil)
+		return nil, nil, nil, gut.Err(false, "invalid filename", nil)
 	}
 
 	// * Construct path
@@ -23,15 +22,9 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 	absoluteFilePath := r.filepath.AbsPath(filepath.Clean(relativeFilePath))
 	absoluteDirectoryPath := r.filepath.AbsPath(directory)
 
-	// * Check token
-	attribute, err := r.signature.VerifyInt(strawhouse.SignatureActionUpload, relativeFilePath, token)
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
-
 	// * Ensure directory
 	if err := os.MkdirAll(absoluteDirectoryPath, 0700); err != nil {
-		return nil, nil, nil, nil, gut.Err(false, "unable to create directory", err)
+		return nil, nil, nil, gut.Err(false, "unable to create directory", err)
 	}
 
 	// * Calculate sha256 hash
@@ -48,19 +41,19 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 
 	// * Check hash
 	if val, err := r.pogreb.Sum.Get(sum); err != nil {
-		return nil, nil, nil, nil, gut.Err(false, "unable to check hash", err)
+		return nil, nil, nil, gut.Err(false, "unable to check hash", err)
 	} else {
 		if val != nil {
 			// Check if file already exists in other path
 			pathVal := string(val)
 			if pathVal != relativeFilePath {
-				return nil, nil, nil, nil, gut.Err(false, "file already exists in other path", nil)
+				return nil, nil, nil, gut.Err(false, "file already exists in other path", nil)
 			}
 
 			// If file exists and not corrupted, deny upload
 			if _, err := os.Stat(absoluteFilePath); err == nil {
 				if er := r.fileflag.Corrupted(relativeFilePath); er == nil {
-					return nil, nil, nil, nil, gut.Err(false, "file already exist", nil)
+					return nil, nil, nil, gut.Err(false, "file already exist", nil)
 				}
 			}
 		}
@@ -68,7 +61,7 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 
 	// * Save hash
 	if err := r.pogreb.Sum.Put(sum, []byte(relativeFilePath)); err != nil {
-		return nil, nil, nil, nil, gut.Err(false, "unable to save hash", err)
+		return nil, nil, nil, gut.Err(false, "unable to save hash", err)
 	}
 
 	// * Save log
@@ -76,7 +69,7 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 	sizeBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(sizeBytes, size)
 	if err := r.pogreb.Log.Put(sizeBytes, sum); err != nil {
-		return nil, nil, nil, nil, gut.Err(false, "unable to save log", err)
+		return nil, nil, nil, gut.Err(false, "unable to save log", err)
 	}
 
 	// * Encode base64 hash
@@ -84,5 +77,5 @@ func (r *Service) Upload(token string, name string, directory string, file io.Re
 	encoded = encoded[:len(encoded)-1]
 	r.signature.ReplaceClean(&encoded)
 
-	return &relativeFilePath, attribute, sum, &encoded, nil
+	return &relativeFilePath, sum, &encoded, nil
 }

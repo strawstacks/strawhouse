@@ -10,6 +10,7 @@ import (
 	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/system"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/feed"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/metadata"
+	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/transfer"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/service/file"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/util/fileflag"
@@ -37,6 +38,7 @@ func main() {
 			endpoint.Bind,
 			metadata.Register,
 			feed.Register,
+			transfer.Register,
 		),
 	).Run()
 }
