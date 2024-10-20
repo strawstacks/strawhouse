@@ -4,6 +4,7 @@ import (
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/fiber"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/grpc"
+	"github.com/strawstacks/strawhouse/strawhouse-backend/common/logger"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint"
 	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/get"
@@ -21,6 +22,7 @@ import (
 
 func main() {
 	fx.New(
+		logger.Init(),
 		fx.Provide(
 			config.Init,
 			pogreb.Init,
