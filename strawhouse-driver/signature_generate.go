@@ -67,16 +67,19 @@ func (r *Signature) Generate(action SignatureAction, mode SignatureMode, path st
 	data[5] = byte(offset >> 8)
 	data[6] = byte(offset)
 
+	// Add salt 3 byte
+	gut.Rand.Read(data[7:10])
+
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 7}
+	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 10, Cap: 10}
 	hash := r.GetHash()
 	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	hash.Write([]byte(path))
 	hash.Write(attribute)
 	signature := hash.Sum(nil)
 	r.PutHash(hash)
-	copy(data[7:], signature[:23])
+	copy(data[10:], signature[:20])
 
 	// * Encode data
 	attributeLength := base64.StdEncoding.EncodedLen(len(attribute))

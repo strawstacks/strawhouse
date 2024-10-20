@@ -8,14 +8,20 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func (r *Service) Upload(name string, directory string, file io.ReadCloser) (*string, []byte, *string, *gut.ErrorInstance) {
-	// * Normalize file name
-	name = r.filepath.BaseName(name)
+	// * Validate name
+	if strings.HasPrefix(name, ".") {
+		return nil, nil, nil, gut.Err(false, "invalid filename", nil)
+	}
 	if len(name) < 3 {
 		return nil, nil, nil, gut.Err(false, "invalid filename", nil)
 	}
+
+	// * Normalize file name
+	name = r.filepath.BaseName(name)
 
 	// * Construct path
 	relativeFilePath := filepath.Clean(filepath.Join(directory, name))
@@ -60,7 +66,7 @@ func (r *Service) Upload(name string, directory string, file io.ReadCloser) (*st
 	}
 
 	// * Save hash
-	if err := r.pogreb.Sum.Put(sum, []byte(relativeFilePath)); err != nil {
+	if err := r.pogreb.Sum.Put(sum, []byte("/"+relativeFilePath)); err != nil {
 		return nil, nil, nil, gut.Err(false, "unable to save hash", err)
 	}
 

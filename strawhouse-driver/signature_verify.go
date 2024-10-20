@@ -77,7 +77,7 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) ([
 
 	// * Sign data
 	dataHeader := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 7, Cap: 7}
+	splitDataHeader := reflect.SliceHeader{Data: dataHeader.Data, Len: 10, Cap: 10}
 	hash := r.GetHash()
 	hash.Write(*(*[]byte)(unsafe.Pointer(&splitDataHeader)))
 	hash.Write(pathValue)
@@ -86,7 +86,7 @@ func (r *Signature) VerifyInt(act SignatureAction, path string, token string) ([
 	r.PutHash(hash)
 
 	// * Compare token
-	if !bytes.Equal(data[7:], signature[:23]) {
+	if !bytes.Equal(data[10:], signature[:20]) {
 		return nil, gut.Err(false, "invalid token")
 	}
 
