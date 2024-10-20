@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func (r *Server) Upload(ctx context.Context, req *pb.UploadRequest) (*emptypb.Empty, error) {
+func (r *Server) FileUpload(ctx context.Context, req *pb.UploadRequest) (*emptypb.Empty, error) {
 	// * Create io.Reader
 	reader := bytes.NewReader(req.Content)
 	readCloser := io.NopCloser(reader)
@@ -22,8 +22,13 @@ func (r *Server) Upload(ctx context.Context, req *pb.UploadRequest) (*emptypb.Em
 		return nil, er
 	}
 
+	// * Create directory
+	if er := os.MkdirAll(r.Filepath.AbsPath(req.Directory), 0700); er != nil {
+		return nil, gut.Err(false, "unable to create directory", er)
+	}
+
 	// * Create file
-	file, err := os.Create(*path)
+	file, err := os.Create(r.Filepath.AbsPath(*path))
 	if err != nil {
 		return nil, gut.Err(false, "unable to create file", err)
 	}
@@ -32,8 +37,8 @@ func (r *Server) Upload(ctx context.Context, req *pb.UploadRequest) (*emptypb.Em
 	}()
 
 	// * Save file
-	if _, err := io.Copy(file, reader); err != nil {
-		return nil, gut.Err(false, "unable to save file", err)
+	if _, err := file.Write(req.Content); err != nil {
+		return nil, gut.Err(false, "unable to write file", err)
 	}
 
 	// * Construct file flag

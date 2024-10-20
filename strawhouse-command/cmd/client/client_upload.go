@@ -13,10 +13,10 @@ var TransferUploadCmd = &cobra.Command{
 	Short: "Upload a file",
 	Run: func(cmd *cobra.Command, args []string) {
 		common.InitDriver()
-		src := cmd.Flag("src").Value.String()
-		dest, _ := cmd.Flags().GetString("dest")
-		name := filepath.Base(dest)
-		directory := filepath.Dir(dest)
+		src, _ := cmd.Flags().GetString("src")
+		dst, _ := cmd.Flags().GetString("dst")
+		name := filepath.Base(dst)
+		directory := filepath.Dir(dst)
 
 		// * Read file
 		content, err := os.ReadFile(src)
@@ -28,14 +28,14 @@ var TransferUploadCmd = &cobra.Command{
 			gut.Fatal("unable to upload file", err)
 		}
 
-		common.Handle("file uploaded to "+dest, nil)
+		common.Handle("file uploaded to "+dst, nil)
 	},
 }
 
 func init() {
-	FeedUploadCmd.Flags().String("src", "", "Source file")
-	FeedUploadCmd.Flags().String("dest", "", "Destination file")
-	_ = FeedUploadCmd.MarkFlagRequired("src")
-	_ = FeedUploadCmd.MarkFlagRequired("dest")
+	TransferUploadCmd.Flags().String("src", "", "Source file")
+	TransferUploadCmd.Flags().String("dst", "", "Destination path (including filename)")
+	_ = TransferUploadCmd.MarkFlagRequired("src")
+	_ = TransferUploadCmd.MarkFlagRequired("dst")
 	Cmd.AddCommand(TransferUploadCmd)
 }

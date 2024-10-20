@@ -51,7 +51,7 @@ func Init() *Config {
 
 	// * Normalize config
 	*config.DataRoot, _ = filepath.Abs(*config.DataRoot)
-	if err := os.MkdirAll(*config.DataRoot, 0755); err != nil {
+	if err := os.MkdirAll(*config.DataRoot, 0700); err != nil {
 		gut.Fatal("unable to create data root", err)
 	}
 
