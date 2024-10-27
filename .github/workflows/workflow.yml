@@ -31,8 +31,8 @@ jobs:
         run: |
           LATEST=$(curl -s https://api.github.com/repos/protocolbuffers/protobuf/releases/latest | jq -r '.tag_name')
           wget -O /tmp/protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/${LATEST}/protoc-${LATEST#v}-linux-x86_64.zip
-          unzip -o /tmp/protoc.zip -d /usr/local bin/protoc
-          unzip -o /tmp/protoc.zip -d /usr/local 'include/*'
+          sudo unzip -o /tmp/protoc.zip -d /usr/local bin/protoc
+          sudo unzip -o /tmp/protoc.zip -d /usr/local 'include/*'
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           export PATH="$PATH:$(go env GOPATH)/bin"
