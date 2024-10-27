@@ -13,6 +13,8 @@ func Init(lc fx.Lifecycle, config *config.Config) *fiber.App {
 		ErrorHandler:                 ErrorHandler,
 		Prefork:                      false,
 		StrictRouting:                true,
+		AppName:                      "strawhouse/" + gut.Commit,
+		ServerHeader:                 "strawhouse/" + gut.Commit,
 		StreamRequestBody:            true,
 		DisablePreParseMultipartForm: true,
 		Network:                      *config.WebListen[0],

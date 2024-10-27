@@ -17,3 +17,14 @@ func (r *Client) TransferUpload(name string, directory string, content []byte, a
 	)
 	return err
 }
+
+func (r *Client) TransferGet(path string) (*pb.DownloadResponse, error) {
+	resp, err := r.driverTransferClient.FileDownloadPath(
+		context.TODO(),
+		&pb.DownloadPathRequest{
+			Path: path,
+		},
+	)
+
+	return resp, err
+}

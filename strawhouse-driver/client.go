@@ -18,6 +18,7 @@ type Clienter interface {
 	Close() error
 	DirectoryList(directory string) (*pb.DirectoryListResponse, error)
 	TransferUpload(name string, directory string, content []byte, attribute []byte) error
+	TransferGet(path string) (*pb.DownloadResponse, error)
 	FeedUpload(directory string, callback func(resp *pb.UploadFeedResponse, err error)) (*FeedUploadSession, error)
 }
 
