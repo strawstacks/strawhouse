@@ -26,24 +26,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 4: Install dependencies
-      - name: Install protoc
+      # Step 4: Compile protoc
+      - name: Compile protoc
         run: |
-          sudo apt-get update > /dev/null
-          sudo apt-get install -y protobuf-compiler > /dev/null
+          LATEST=$(curl -s https://api.github.com/repos/protocolbuffers/protobuf/releases/latest | jq -r '.tag_name')
+          wget -O /tmp/protoc.zip https://github.com/protocolbuffers/protobuf/releases/download/${LATEST}/protoc-${LATEST}-linux-x86_64.zip
+          unzip -o /tmp/protoc.zip -d /usr/local bin/protoc
+          unzip -o /tmp/protoc.zip -d /usr/local 'include/*'
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
           export PATH="$PATH:$(go env GOPATH)/bin"
+          make protoc
 
-      # Step 5: Sync driver to strawhouse-go
-      - name: Sync driver to strawhouse-go
+      # Step 5: Sync driver repo
+      - name: Sync driver repo
         run: |
           rm -r .git
           git clone https://github.com/strawstacks/strawhouse-go.git
           find strawhouse-go -mindepth 1 ! -path '*/.git*' ! -path '*.md' -exec rm -rf {} +
           cp -r driver/* strawhouse-go
           mkdir -p strawhouse-go/pb
-          protoc --go_out=./strawhouse-go --go-grpc_out=./strawhouse-go ./proto/**/*.proto
           cd strawhouse-go
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -56,7 +58,6 @@ jobs:
       # Step 6: Build binary
       - name: Build binary
         run: |
-          make protoc
           make release
           RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
           curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"

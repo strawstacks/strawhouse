@@ -11,14 +11,9 @@ COPY ./driver ./driver
 COPY ./proto ./proto
 COPY ./go.work ./go.work
 COPY ./go.work.sum ./go.work.sum
-COPY ./Makefile ./Makefile
 
 # Install dependencies and build
-RUN apt update > /dev/null && \
-    apt install -y protobuf-compiler > /dev/null && \
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
-    export PATH="$PATH:$(go env GOPATH)/bin" && \
+RUN export PATH="$PATH:$(go env GOPATH)/bin" && \
     go build -o ./.local/strawhousebackd ./backend
 
 # Stage 2: Create the final image
