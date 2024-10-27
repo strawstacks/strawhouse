@@ -1,8 +1,7 @@
 go 1.23.1
 
 use (
-	./strawhouse-backend
-	./strawhouse-command
-	./strawhouse-driver
-	./strawhouse-proto
+	./backend
+	./command
+	./driver
 )

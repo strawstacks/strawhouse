@@ -41,11 +41,9 @@ jobs:
           rm -r .git
           git clone https://github.com/strawstacks/strawhouse-go.git
           find strawhouse-go -mindepth 1 ! -path '*/.git*' ! -path '*.md' -exec rm -rf {} +
-          cp -r strawhouse-driver/* strawhouse-go
+          cp -r driver/* strawhouse-go
           mkdir -p strawhouse-go/pb
-          protoc --go_out=./strawhouse-go --go-grpc_out=./strawhouse-go ./strawhouse-proto/**/*.proto
-          sed -i 's|strawhouse/strawhouse-driver|strawhouse-go|g' strawhouse-go/go.mod
-          sed -i 's|strawhouse/strawhouse-proto|strawhouse-go|g' strawhouse-go/*.go
+          protoc --go_out=./strawhouse-go --go-grpc_out=./strawhouse-go ./proto/**/*.proto
           cd strawhouse-go
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

@@ -4,7 +4,7 @@ bench:
 
 .PHONY: protoc
 protoc:
-	protoc --go_out=./strawhouse-proto --go-grpc_out=./strawhouse-proto ./strawhouse-proto/**/*.proto
+	protoc --go_out=./driver --go-grpc_out=./driver ./proto/**/*.proto
 
 .PHONY: release
 release:

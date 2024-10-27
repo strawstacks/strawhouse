@@ -3,7 +3,7 @@
 /.env
 
 # Build
-/strawhouse-proto/pb
+/driver/pb
 
 # Editor
 .vscode/
