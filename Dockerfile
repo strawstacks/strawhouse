@@ -1,7 +1,7 @@
 # Stage 1: Build go binary
-FROM golang:1.23-bookworm AS builder
+FROM golang:1.23.1-bookworm AS builder
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /opt
 
 # Copy the source code
@@ -19,15 +19,17 @@ RUN apt update > /dev/null && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
     export PATH="$PATH:$(go env GOPATH)/bin" && \
-    make protoc && \
     go build -o ./.local/strawhousebackd ./backend
 
 # Stage 2: Create the final image
-FROM debian:bookworm
+FROM alpine:3
 
-# Copy the compiled binary from the builder stage
+# Install dependencies
+RUN apk add --no-cache ca-certificates gcompat libstdc++
+
+# Copy binary
 COPY --from=builder /opt/.local/strawhousebackd /usr/local/bin/strawhousebackd
 
-# Command to run the application
+# Entrypoint
 WORKDIR /opt
 CMD ["strawhousebackd"]
