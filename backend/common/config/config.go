@@ -55,6 +55,10 @@ func Init() *Config {
 	if err := os.MkdirAll(*config.DataRoot, 0700); err != nil {
 		gut.Fatal("unable to create data root", err)
 	}
+	*config.PluginPath, _ = filepath.Abs(*config.PluginPath)
+	if err := os.MkdirAll(*config.PluginPath, 0700); err != nil {
+		gut.Fatal("unable to create plugin path", err)
+	}
 
 	return config
 }

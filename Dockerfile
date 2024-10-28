@@ -1,29 +1,24 @@
 # Stage 1: Build go binary
 FROM golang:1.23.1-bookworm AS builder
 
-# Set the working directory
-WORKDIR /opt
-
 # Copy the source code
-COPY ./backend ./backend
-COPY ./command ./command
-COPY ./driver ./driver
-COPY ./proto ./proto
-COPY ./go.work ./go.work
-COPY ./go.work.sum ./go.work.sum
+COPY ./backend /opt/backend
+
+# Set the working directory
+WORKDIR /opt/backend
 
 # Install dependencies and build
 RUN export PATH="$PATH:$(go env GOPATH)/bin" && \
-    go build -o ./.local/strawhousebackd ./backend
+    go build -trimpath -o ./.local/strawhousebackd .
 
 # Stage 2: Create the final image
 FROM alpine:3
 
 # Install dependencies
-RUN apk add --no-cache ca-certificates gcompat libstdc++
+RUN apk add --no-cache gcompat libstdc++
 
 # Copy binary
-COPY --from=builder /opt/.local/strawhousebackd /usr/local/bin/strawhousebackd
+COPY --from=builder /opt/backend/.local/strawhousebackd /usr/local/bin/strawhousebackd
 
 # Entrypoint
 WORKDIR /opt
