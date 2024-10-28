@@ -41,7 +41,6 @@ jobs:
       # Step 5: Sync driver repo
       - name: Sync driver repo
         run: |
-          rm -r .git
           git clone https://github.com/strawstacks/strawhouse-go.git
           find strawhouse-go -mindepth 1 ! -path '*/.git*' ! -path '*.md' -exec rm -rf {} +
           cp -r driver/* strawhouse-go

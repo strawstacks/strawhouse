@@ -3,7 +3,7 @@ package fiber
 import (
 	"errors"
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/type/response"
+	"strawhouse-backend/type/response"
 	"strings"
 
 	"github.com/go-playground/validator/v10"

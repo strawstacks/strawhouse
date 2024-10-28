@@ -2,11 +2,11 @@ package file
 
 import (
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/fileflag"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
+	"strawhouse-backend/common/config"
+	"strawhouse-backend/common/pogreb"
+	"strawhouse-backend/util/eventfeed"
+	"strawhouse-backend/util/fileflag"
+	"strawhouse-backend/util/filepath"
 )
 
 type Service struct {

@@ -3,9 +3,9 @@ package plugin
 import (
 	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/service/file"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
 	"io"
+	"strawhouse-backend/service/file"
+	"strawhouse-backend/util/eventfeed"
 )
 
 func (r *Service) Plugger() strawhouse.PluginCallback {

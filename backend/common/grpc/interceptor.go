@@ -2,11 +2,11 @@ package grpc
 
 import (
 	"context"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"strawhouse-backend/common/config"
 )
 
 func NewInterceptor(config *config.Config) *Interceptor {

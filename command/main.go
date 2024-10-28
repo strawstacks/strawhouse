@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/strawstacks/strawhouse/command/cmd/client"
-	"github.com/strawstacks/strawhouse/command/cmd/config"
-	"github.com/strawstacks/strawhouse/command/cmd/sign"
-	"github.com/strawstacks/strawhouse/command/common"
 	"os"
+	"strawhouse-command/cmd/client"
+	"strawhouse-command/cmd/config"
+	"strawhouse-command/cmd/sign"
+	"strawhouse-command/common"
 )
 
 var cmd = &cobra.Command{

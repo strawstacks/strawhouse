@@ -1,8 +1,8 @@
 package filepath
 
 import (
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"regexp"
+	"strawhouse-backend/common/config"
 )
 
 type Filepath struct {

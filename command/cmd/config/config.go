@@ -6,10 +6,10 @@ import (
 	"github.com/bsthun/gut"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/strawstacks/strawhouse/command/common"
 	"github.com/zalando/go-keyring"
 	"log"
 	"os"
+	"strawhouse-command/common"
 	"strings"
 )
 

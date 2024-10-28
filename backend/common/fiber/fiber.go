@@ -4,17 +4,24 @@ import (
 	"context"
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"go.uber.org/fx"
+	"strawhouse-backend/common/config"
 )
 
 func Init(lc fx.Lifecycle, config *config.Config) *fiber.App {
+	name := "Strawhouse"
+	if gut.Version != "" {
+		name += " " + gut.Version
+	}
+	if gut.Commit != "" {
+		name += " (" + gut.Commit + ")"
+	}
 	app := fiber.New(fiber.Config{
 		ErrorHandler:                 ErrorHandler,
 		Prefork:                      false,
 		StrictRouting:                true,
-		AppName:                      "strawhouse/" + gut.Commit,
-		ServerHeader:                 "strawhouse/" + gut.Commit,
+		AppName:                      name,
+		ServerHeader:                 name,
 		StreamRequestBody:            true,
 		DisablePreParseMultipartForm: true,
 		Network:                      *config.WebListen[0],

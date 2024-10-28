@@ -3,9 +3,9 @@ package client
 import (
 	"github.com/bsthun/gut"
 	"github.com/spf13/cobra"
-	"github.com/strawstacks/strawhouse/command/common"
 	"os"
 	"path/filepath"
+	"strawhouse-command/common"
 )
 
 var TransferGetCmd = &cobra.Command{

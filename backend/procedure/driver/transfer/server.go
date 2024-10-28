@@ -2,13 +2,13 @@ package transfer
 
 import (
 	"github.com/strawstacks/strawhouse-go/pb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/service/file"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/fileflag"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
 	"google.golang.org/grpc"
+	"strawhouse-backend/common/config"
+	"strawhouse-backend/common/pogreb"
+	"strawhouse-backend/service/file"
+	"strawhouse-backend/util/eventfeed"
+	"strawhouse-backend/util/fileflag"
+	"strawhouse-backend/util/filepath"
 )
 
 type Server struct {

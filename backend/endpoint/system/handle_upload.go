@@ -5,9 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/strawstacks/strawhouse-go"
 	"github.com/strawstacks/strawhouse-go/pb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/type/payload"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/type/response"
 	"path/filepath"
+	"strawhouse-backend/type/payload"
+	"strawhouse-backend/type/response"
 )
 
 // Upload TODO: Implement body streaming

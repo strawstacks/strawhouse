@@ -28,7 +28,7 @@ func (r *Logger) LogEvent(event fxevent.Event) {
 	if strings.HasPrefix(constructor, "go.uber.org/") {
 		return
 	}
-	constructor = strings.TrimPrefix(constructor, "github.com/strawstacks/strawhouse/strawhouse-backend/")
+	constructor = strings.TrimPrefix(constructor, "strawhouse-backend/")
 
 	if eventElem.NumField() > 3 {
 		output := eventElem.Field(3)

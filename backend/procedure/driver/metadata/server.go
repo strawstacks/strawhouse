@@ -2,11 +2,11 @@ package metadata
 
 import (
 	"github.com/strawstacks/strawhouse-go/pb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
 	"google.golang.org/grpc"
+	"strawhouse-backend/common/config"
+	"strawhouse-backend/common/pogreb"
+	"strawhouse-backend/util/eventfeed"
+	"strawhouse-backend/util/filepath"
 )
 
 type Server struct {

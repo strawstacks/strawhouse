@@ -4,10 +4,10 @@ import (
 	"context"
 	"github.com/bsthun/gut"
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"net"
+	"strawhouse-backend/common/config"
 )
 
 func Init(lc fx.Lifecycle, config *config.Config) *grpc.Server {

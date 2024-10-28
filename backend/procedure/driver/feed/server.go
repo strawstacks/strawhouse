@@ -2,8 +2,8 @@ package feed
 
 import (
 	"github.com/strawstacks/strawhouse-go/pb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
 	"google.golang.org/grpc"
+	"strawhouse-backend/util/eventfeed"
 )
 
 type Server struct {

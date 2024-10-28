@@ -1,24 +1,24 @@
 package main
 
 import (
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/fiber"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/grpc"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/logger"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/pogreb"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/get"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/endpoint/system"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/feed"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/metadata"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/procedure/driver/transfer"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/service/file"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/service/plugin"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/fileflag"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/signature"
 	"go.uber.org/fx"
+	"strawhouse-backend/common/config"
+	"strawhouse-backend/common/fiber"
+	"strawhouse-backend/common/grpc"
+	"strawhouse-backend/common/logger"
+	"strawhouse-backend/common/pogreb"
+	"strawhouse-backend/endpoint"
+	"strawhouse-backend/endpoint/get"
+	"strawhouse-backend/endpoint/system"
+	"strawhouse-backend/procedure/driver/feed"
+	"strawhouse-backend/procedure/driver/metadata"
+	"strawhouse-backend/procedure/driver/transfer"
+	"strawhouse-backend/service/file"
+	"strawhouse-backend/service/plugin"
+	"strawhouse-backend/util/eventfeed"
+	"strawhouse-backend/util/fileflag"
+	"strawhouse-backend/util/filepath"
+	"strawhouse-backend/util/signature"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 			get.NewHandler,
 		),
 		fx.Invoke(
-			consume,
+			invoke,
 			endpoint.Bind,
 			metadata.Register,
 			feed.Register,
@@ -48,6 +48,6 @@ func main() {
 	).Run()
 }
 
-func consume(plugin *plugin.Service) {
+func invoke(plugin *plugin.Service) {
 	_ = plugin
 }

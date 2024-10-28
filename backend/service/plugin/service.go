@@ -3,10 +3,10 @@ package plugin
 import (
 	"context"
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/common/config"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/service/file"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/eventfeed"
 	"go.uber.org/fx"
+	"strawhouse-backend/common/config"
+	"strawhouse-backend/service/file"
+	"strawhouse-backend/util/eventfeed"
 )
 
 type Store struct {

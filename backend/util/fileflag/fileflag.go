@@ -2,7 +2,7 @@ package fileflag
 
 import (
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/strawhouse-backend/util/filepath"
+	"strawhouse-backend/util/filepath"
 )
 
 const xattrSumTag = "user.sh.sum"

@@ -2,7 +2,7 @@ package client
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/strawstacks/strawhouse/command/common"
+	"strawhouse-command/common"
 )
 
 var Cmd = &cobra.Command{

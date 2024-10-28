@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse/command/common"
 	"log"
+	"strawhouse-command/common"
 	"strings"
 	"time"
 )

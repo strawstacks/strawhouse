@@ -10,6 +10,7 @@ import (
 )
 
 type Config struct {
+	Version     *string
 	WebListen   []*string `env:"STRAWHOUSE_WEB_LISTEN" yaml:"webListen" validate:"required"`
 	ProtoListen []*string `env:"STRAWHOUSE_PROTO_LISTEN" yaml:"protoListen" validate:"required"`
 	DataRoot    *string   `env:"STRAWHOUSE_DATA_ROOT" yaml:"dataRoot" validate:"dirpath"`
