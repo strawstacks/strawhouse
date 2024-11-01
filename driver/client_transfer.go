@@ -3,9 +3,17 @@ package strawhouse
 import (
 	"github.com/strawstacks/strawhouse-go/pb"
 	"golang.org/x/net/context"
+	"strings"
 )
 
 func (r *Client) TransferUpload(name string, directory string, content []byte, attribute []byte) error {
+	if !strings.HasPrefix(directory, "/") {
+		directory = "/" + directory
+	}
+	if !strings.HasSuffix(directory, "/") {
+		directory = directory + "/"
+	}
+
 	_, err := r.driverTransferClient.FileUpload(
 		context.TODO(),
 		&pb.UploadRequest{

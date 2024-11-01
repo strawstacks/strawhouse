@@ -6,6 +6,7 @@ require (
 	github.com/akrylysov/pogreb v0.10.2
 	github.com/bsthun/gut v1.1.1
 	github.com/caarlos0/env/v11 v11.2.2
+	github.com/davecgh/go-spew v1.1.1
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/pkg/xattr v0.4.10

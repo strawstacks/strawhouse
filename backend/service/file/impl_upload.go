@@ -5,13 +5,16 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"github.com/bsthun/gut"
+	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawstacks/strawhouse-go/pb"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func (r *Service) Upload(name string, directory string, file io.Reader) (*string, []byte, *string, *gut.ErrorInstance) {
+func (r *Service) Upload(name string, directory string, attribute []byte, content io.Reader) (*string, []byte, *string, *gut.ErrorInstance) {
 	// * Validate name
 	if strings.HasPrefix(name, ".") {
 		return nil, nil, nil, gut.Err(false, "invalid filename", nil)
@@ -33,17 +36,29 @@ func (r *Service) Upload(name string, directory string, file io.Reader) (*string
 		return nil, nil, nil, gut.Err(false, "unable to create directory", err)
 	}
 
+	// * Create file
+	file, err := os.Create(absoluteFilePath)
+	if err != nil {
+		return nil, nil, nil, gut.Err(false, "unable to create file", err)
+	}
+
 	// * Calculate sha256 hash
 	hash := sha256.New()
 	fileBuffer := make([]byte, 1024)
 	for {
-		n, err := file.Read(fileBuffer)
+		n, err := content.Read(fileBuffer)
 		if err != nil {
 			break
+		}
+		if _, err := file.Write(fileBuffer[:n]); err != nil {
+			return nil, nil, nil, gut.Err(false, "unable to write file", err)
 		}
 		hash.Write(fileBuffer[:n])
 	}
 	sum := hash.Sum(nil)
+	if err := file.Close(); err != nil {
+		return nil, nil, nil, gut.Err(false, "unable to close file", err)
+	}
 
 	// * Check hash
 	if val, err := r.pogreb.Sum.Get(sum); err != nil {
@@ -66,7 +81,7 @@ func (r *Service) Upload(name string, directory string, file io.Reader) (*string
 	}
 
 	// * Save hash
-	if err := r.pogreb.Sum.Put(sum, []byte("/"+relativeFilePath)); err != nil {
+	if err := r.pogreb.Sum.Put(sum, []byte(relativeFilePath)); err != nil {
 		return nil, nil, nil, gut.Err(false, "unable to save hash", err)
 	}
 
@@ -83,5 +98,26 @@ func (r *Service) Upload(name string, directory string, file io.Reader) (*string
 	encoded = encoded[:len(encoded)-1]
 	r.signature.ReplaceClean(&encoded)
 
+	// * Set file flag
+	if er := r.fileflag.SumSet(relativeFilePath, sum); er != nil {
+		return nil, nil, nil, er
+	}
+
+	// * Construct file flag
+	if er := r.fileflag.CorruptedInit(relativeFilePath); er != nil {
+		return nil, nil, nil, er
+	}
+
+	log.Printf("firing")
+
+	// * Fire event feed
+	r.eventfeed.Fire(strawhouse.FeedTypeUpload, relativeFilePath, &pb.UploadFeedResponse{
+		Name:      name,
+		Directory: directory,
+		Hash:      encoded,
+		Attr:      attribute,
+	})
+
+	log.Printf("returning %v, %v, %v", &relativeFilePath, sum, &encoded)
 	return &relativeFilePath, sum, &encoded, nil
 }
