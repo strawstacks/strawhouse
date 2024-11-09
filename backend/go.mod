@@ -10,7 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/pkg/xattr v0.4.10
-	github.com/strawstacks/strawhouse-go v0.1.6
+	github.com/strawst/strawhouse-go v0.1.6
 	go.uber.org/fx v1.23.0
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1

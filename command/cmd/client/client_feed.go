@@ -2,7 +2,7 @@ package client
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go/pb"
 	"strawhouse-command/common"
 )
 

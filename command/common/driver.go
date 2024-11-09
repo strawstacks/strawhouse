@@ -3,7 +3,7 @@ package common
 import (
 	"github.com/bsthun/gut"
 	"github.com/spf13/viper"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"github.com/zalando/go-keyring"
 )
 

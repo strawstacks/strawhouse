@@ -13,7 +13,7 @@ protoc:
 .PHONY: release
 release:
 	mkdir -p ./.local/release/
-	cd backend && go get -u github.com/strawstacks/strawhouse-go@latest
+	cd backend && go get -u github.com/strawst/strawhouse-go@latest
 	cd backend && env GOWORK=off GOOS=linux GOARCH=amd64 go build $(GOFLAGS) -o ../.local/release/strawhousebackd_linux_amd64 .
 	cd backend && env GOWORK=off GOOS=linux GOARCH=arm64 go build $(GOFLAGS) -o ../.local/release/strawhousebackd_linux_arm64 .
 	env GOOS=linux GOARCH=amd64 go build $(GOFLAGS) -o ./.local/release/strawc_linux_amd64 ./command/

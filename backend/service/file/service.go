@@ -1,7 +1,7 @@
 package file
 
 import (
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"strawhouse-backend/common/config"
 	"strawhouse-backend/common/pogreb"
 	"strawhouse-backend/util/eventfeed"

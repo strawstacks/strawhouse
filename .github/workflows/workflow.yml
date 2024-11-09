@@ -41,7 +41,7 @@ jobs:
       # Step 5: Sync driver repo
       - name: Sync driver repo
         run: |
-          git clone https://github.com/strawstacks/strawhouse-go.git
+          git clone https://github.com/strawst/strawhouse-go.git
           find strawhouse-go -mindepth 1 ! -path '*/.git*' ! -path '*.md' -exec rm -rf {} +
           cp -r driver/* strawhouse-go
           mkdir -p strawhouse-go/pb
@@ -51,22 +51,22 @@ jobs:
           git add .
           git commit -m "Sync driver on strawhouse tag ${{ github.ref_name }}" || exit 0
           git tag -a ${{ github.ref_name }} -m "Sync driver on strawhouse tag ${{ github.ref_name }}"
-          git push https://bsthun:${{ secrets.PAT_TOKEN }}@github.com/strawstacks/strawhouse-go.git main
-          curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -d '{"tag_name": "${{ github.ref_name }}", "name": "${{ github.ref_name }}", "body": "Sync driver on strawhouse tag ${{ github.ref_name }}"}' https://api.github.com/repos/strawstacks/strawhouse-go/releases
+          git push https://bsthun:${{ secrets.PAT_TOKEN }}@github.com/strawst/strawhouse-go.git main
+          curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" -d '{"tag_name": "${{ github.ref_name }}", "name": "${{ github.ref_name }}", "body": "Sync driver on strawhouse tag ${{ github.ref_name }}"}' https://api.github.com/repos/strawst/strawhouse-go/releases
 
       # Step 6: Build binary
       - name: Build binary
         run: |
           make release
-          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawstacks/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_arm64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_linux_amd64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_linux_arm64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_amd64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_amd64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_arm64" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_arm64"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_amd64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_amd64.exe"
-          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_arm64.exe" "https://uploads.github.com/repos/strawstacks/strawhouse/releases/$RELEASE/assets?name=strawc_windows_arm64.exe"
+          RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}"  "https://api.github.com/repos/strawst/strawhouse/releases/tags/${{ github.ref_name }}" | jq -r '.id')
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_amd64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawhousebackd_linux_arm64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawhousebackd_linux_arm64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_amd64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_linux_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_linux_arm64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_linux_arm64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_amd64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_amd64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_darwin_arm64" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_darwin_arm64"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_amd64.exe" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_windows_amd64.exe"
+          curl -s -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Content-Type: application/octet-stream" --data-binary "@./.local/release/strawc_windows_arm64.exe" "https://uploads.github.com/repos/strawst/strawhouse/releases/$RELEASE/assets?name=strawc_windows_arm64.exe"
 
       # Step 4: Build docker
       - name: Build docker
@@ -75,6 +75,6 @@ jobs:
           BUILDX_NO_DEFAULT_ATTESTATIONS=1 \
             docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            --tag ghcr.io/strawstacks/strawhouse-backend:${{ github.ref_name }} \
-            --tag ghcr.io/strawstacks/strawhouse-backend:latest \
+            --tag ghcr.io/strawst/strawhouse-backend:${{ github.ref_name }} \
+            --tag ghcr.io/strawst/strawhouse-backend:latest \
             --push .

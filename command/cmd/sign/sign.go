@@ -3,7 +3,7 @@ package sign
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"log"
 	"strawhouse-command/common"
 	"strings"

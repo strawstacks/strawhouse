@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"

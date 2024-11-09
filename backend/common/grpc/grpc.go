@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"net"

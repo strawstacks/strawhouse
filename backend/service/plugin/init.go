@@ -3,7 +3,7 @@ package plugin
 import (
 	"fmt"
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"os"
 	"path/filepath"
 	"plugin"

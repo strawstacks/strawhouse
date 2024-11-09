@@ -1,7 +1,7 @@
 package feed
 
 import (
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go/pb"
 	"google.golang.org/grpc"
 	"strawhouse-backend/util/eventfeed"
 )

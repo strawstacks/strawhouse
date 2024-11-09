@@ -1,7 +1,7 @@
 package fileflag
 
 import (
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"strawhouse-backend/util/filepath"
 )
 

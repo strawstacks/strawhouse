@@ -3,7 +3,7 @@ package system
 import (
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"path/filepath"
 	"strawhouse-backend/type/payload"
 	"strawhouse-backend/type/response"

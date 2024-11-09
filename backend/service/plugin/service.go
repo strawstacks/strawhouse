@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"context"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"go.uber.org/fx"
 	"strawhouse-backend/common/config"
 	"strawhouse-backend/service/file"

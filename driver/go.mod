@@ -1,4 +1,4 @@
-module github.com/strawstacks/strawhouse-go
+module github.com/strawst/strawhouse-go
 
 go 1.23.1
 

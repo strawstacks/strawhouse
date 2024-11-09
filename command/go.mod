@@ -6,7 +6,7 @@ require (
 	github.com/bsthun/gut v1.1.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
-	github.com/strawstacks/strawhouse-go v0.1.6
+	github.com/strawst/strawhouse-go v0.1.6
 	github.com/zalando/go-keyring v0.2.5
 )
 

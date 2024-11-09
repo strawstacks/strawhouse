@@ -1,7 +1,7 @@
 package signature
 
 import (
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"strawhouse-backend/common/config"
 )
 

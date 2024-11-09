@@ -2,7 +2,7 @@ package plugin
 
 import (
 	"github.com/bsthun/gut"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"io"
 	"strawhouse-backend/service/file"
 	"strawhouse-backend/util/eventfeed"

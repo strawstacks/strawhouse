@@ -1,8 +1,8 @@
 package feed
 
 import (
-	"github.com/strawstacks/strawhouse-go"
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go"
+	"github.com/strawst/strawhouse-go/pb"
 )
 
 func (r *Server) Upload(req *pb.UploadFeedRequest, stream pb.DriverFeed_UploadServer) error {

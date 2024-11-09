@@ -1,4 +1,4 @@
-<img src="https://static1.pixcee.dev/external/strawstacks/logo.png" width="128px"></img>
+<img src="https://static1.pixcee.dev/external/strawstack/logo.png" width="128px"></img>
 
 # Strawhouse
 Bare minimal file store engine, featured lightweight indexing, signed checksum file integrity, and pre-signed token with access control.
@@ -6,7 +6,7 @@ Bare minimal file store engine, featured lightweight indexing, signed checksum f
 ## Architecture
 - Store file using host filesystem-backed without overhead.
 - Supports signed checksums and flags (file-level validation for compromised direct filesystem modifications) using [xattr](https://en.wikipedia.org/wiki/Extended_file_attributes) stored directly in [inode](https://en.wikipedia.org/wiki/Inode) for lightning fast access and no database overhead.
-- Reengineered stateless pre-signed token for clients to upload and retrieve file with expiration time, path restriction, and custom attribute support. Used only 27-bytes token with bit-by-bit optimization (see [performance benchmark](https://github.com/strawstacks/strawhouse/wiki/Benchmark)).
+- Reengineered stateless pre-signed token for clients to upload and retrieve file with expiration time, path restriction, and custom attribute support. Used only 27-bytes token with bit-by-bit optimization (see [performance benchmark](https://github.com/strawst/strawhouse/wiki/Benchmark)).
 - Get file directly from HTTP GET (with just path and token), upload using pre-defined API endpoints.
 - Store file metadata in high performance key-value embed database: [pogreb](https://github.com/akrylysov/pogreb).
 - Designed and optimized for store and serve millions of static files from the ground up.

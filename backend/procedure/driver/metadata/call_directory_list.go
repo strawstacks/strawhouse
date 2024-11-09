@@ -2,7 +2,7 @@ package metadata
 
 import (
 	"context"
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go/pb"
 	"os"
 	"path/filepath"
 )

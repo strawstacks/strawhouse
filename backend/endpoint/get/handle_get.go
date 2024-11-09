@@ -3,7 +3,7 @@ package get
 import (
 	"github.com/bsthun/gut"
 	"github.com/gofiber/fiber/v2"
-	"github.com/strawstacks/strawhouse-go"
+	"github.com/strawst/strawhouse-go"
 	"mime"
 	"net/url"
 	"os"

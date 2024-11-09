@@ -3,7 +3,7 @@ package transfer
 import (
 	"bytes"
 	"context"
-	"github.com/strawstacks/strawhouse-go/pb"
+	"github.com/strawst/strawhouse-go/pb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
